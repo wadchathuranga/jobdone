@@ -83,128 +83,304 @@ class _HomePageState extends State<HomePage> {
                     children: <Widget>[
                       Column(
                         children: <Widget>[
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton2<String>(
-                              isExpanded: true,
-                              hint: Text(
-                                'Select Item',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  // color: Theme.of(context).hintColor, // TODO: add logic to show validation color change
-                                  color: isSubmit && selectedValue == null
-                                      ? Colors.red.shade900
-                                      : Colors.grey,
-                                ),
-                              ),
-                              items: companyList
-                                  .map((item) => DropdownMenuItem(
-                                        value: item,
-                                        child: Text(
-                                          item,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                              value: selectedValue,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedValue = value;
-                                  isSubmit = false;
-                                  // TODO: remove log
-                                  print("Selected Company: $selectedValue");
-                                });
-                              },
-                              buttonStyleData: ButtonStyleData(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
-                                height: 50,
-                                width: (deviceWidth / 5) * 3,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(5)),
-                                  //border: Border.all(color: Colors.grey), // TODO: add logic to show validation color change
-                                  border: Border.all(
-                                      color: isSubmit && selectedValue == null
-                                          ? Colors.red.shade900
-                                          : Colors.grey),
-                                ),
-                              ),
-                              dropdownStyleData: const DropdownStyleData(
-                                maxHeight: 250,
-                              ),
-                              menuItemStyleData: const MenuItemStyleData(
-                                height: 40,
-                              ),
-                              dropdownSearchData: DropdownSearchData(
-                                searchController: textEditingController,
-                                searchInnerWidgetHeight: 50,
-                                searchInnerWidget: Container(
-                                  height: 50,
-                                  padding: const EdgeInsets.only(
-                                    top: 8,
-                                    bottom: 4,
-                                    right: 8,
-                                    left: 8,
-                                  ),
-                                  child: TextFormField(
-                                    expands: true,
-                                    maxLines: null,
-                                    controller: textEditingController,
-                                    decoration: InputDecoration(
-                                      isDense: true,
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 8,
+                          // DropdownButtonHideUnderline(
+                          //   child: DropdownButton2<String>(
+                          //     isExpanded: true,
+                          //     hint: Text(
+                          //       'Select Item',
+                          //       style: TextStyle(
+                          //         fontSize: 16,
+                          //         // color: Theme.of(context).hintColor, // TODO: add logic to show validation color change
+                          //         color: isSubmit && selectedValue == null
+                          //             ? Colors.red.shade900
+                          //             : Colors.grey,
+                          //       ),
+                          //     ),
+                          //     items: companyList
+                          //         .map((item) => DropdownMenuItem(
+                          //               value: item,
+                          //               child: Text(
+                          //                 item,
+                          //                 style: const TextStyle(
+                          //                   fontSize: 16,
+                          //                 ),
+                          //               ),
+                          //             ))
+                          //         .toList(),
+                          //     value: selectedValue,
+                          //     onChanged: (value) {
+                          //       setState(() {
+                          //         selectedValue = value;
+                          //         isSubmit = false;
+                          //         // TODO: remove log
+                          //         print("Selected Company: $selectedValue");
+                          //       });
+                          //     },
+                          //     buttonStyleData: ButtonStyleData(
+                          //       padding:
+                          //           const EdgeInsets.symmetric(horizontal: 16),
+                          //       height: 50,
+                          //       width: (deviceWidth / 5) * 3,
+                          //       decoration: BoxDecoration(
+                          //         borderRadius: const BorderRadius.all(
+                          //             Radius.circular(5)),
+                          //         //border: Border.all(color: Colors.grey), // TODO: add logic to show validation color change
+                          //         border: Border.all(
+                          //             color: isSubmit && selectedValue == null
+                          //                 ? Colors.red.shade900
+                          //                 : Colors.grey),
+                          //       ),
+                          //     ),
+                          //     dropdownStyleData: const DropdownStyleData(
+                          //       maxHeight: 250,
+                          //     ),
+                          //     menuItemStyleData: const MenuItemStyleData(
+                          //       height: 40,
+                          //     ),
+                          //     dropdownSearchData: DropdownSearchData(
+                          //       searchController: textEditingController,
+                          //       searchInnerWidgetHeight: 50,
+                          //       searchInnerWidget: Container(
+                          //         height: 50,
+                          //         padding: const EdgeInsets.only(
+                          //           top: 8,
+                          //           bottom: 4,
+                          //           right: 8,
+                          //           left: 8,
+                          //         ),
+                          //         child: TextFormField(
+                          //           expands: true,
+                          //           maxLines: null,
+                          //           controller: textEditingController,
+                          //           decoration: InputDecoration(
+                          //             isDense: true,
+                          //             contentPadding:
+                          //                 const EdgeInsets.symmetric(
+                          //               horizontal: 10,
+                          //               vertical: 8,
+                          //             ),
+                          //             hintText: 'Search for an item...',
+                          //             hintStyle: const TextStyle(fontSize: 16),
+                          //             border: OutlineInputBorder(
+                          //               borderRadius: BorderRadius.circular(8),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ),
+                          //       searchMatchFn: (item, searchValue) {
+                          //         return item.value
+                          //             .toString()
+                          //             .toLowerCase()
+                          //             .contains(searchValue.toLowerCase());
+                          //       },
+                          //     ),
+                          //     //This to clear the search value when you close the menu
+                          //     onMenuStateChange: (isOpen) {
+                          //       if (!isOpen) {
+                          //         textEditingController.clear();
+                          //       }
+                          //     },
+                          //   ),
+                          // ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10.0),
+                            child: SizedBox(
+                              width: deviceWidth * 3 / 5,
+                              child: FormField<String>(validator: (value) {
+                                if (selectedValue == null) {
+                                  return "Required!";
+                                } else {
+                                  return null;
+                                }
+                              }, builder: (
+                                FormFieldState<String> state,
+                              ) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    InputDecorator(
+                                      decoration: InputDecoration(
+                                        contentPadding:
+                                            const EdgeInsets.all(0.0),
+                                        labelText: 'Company',
+                                        labelStyle: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                            color: (selectedValue == null &&
+                                                    !isSubmit)
+                                                ? Colors.grey
+                                                : (selectedValue != null &&
+                                                        !isSubmit)
+                                                    ? Colors.grey
+                                                    : Colors.red.shade900),
+                                        border: InputBorder.none,
                                       ),
-                                      hintText: 'Search for an item...',
-                                      hintStyle: const TextStyle(fontSize: 16),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton2<String>(
+                                          isExpanded: true,
+                                          hint: Text(
+                                            'Select Item',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              // color: Theme.of(context).hintColor, // TODO: add logic to show validation color change
+                                              color: isSubmit &&
+                                                      selectedValue == null
+                                                  ? Colors.red.shade900
+                                                  : Colors.grey,
+                                            ),
+                                          ),
+                                          items: companyList
+                                              .map((item) => DropdownMenuItem(
+                                                    value: item,
+                                                    child: Text(
+                                                      item,
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                      ),
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                          value: selectedValue,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              selectedValue = value;
+                                              //isSubmit = false;
+                                              // TODO: remove log
+                                              print(
+                                                  "Selected Company: $selectedValue");
+                                            });
+                                          },
+                                          buttonStyleData: ButtonStyleData(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16),
+                                            height: 50,
+                                            width: (deviceWidth / 5) * 3,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(5)),
+                                              //border: Border.all(color: Colors.grey), // TODO: add logic to show validation color change
+                                              border: Border.all(
+                                                  color:
+                                                      (selectedValue == null &&
+                                                              !isSubmit)
+                                                          ? Colors.grey
+                                                          : (selectedValue !=
+                                                                      null &&
+                                                                  !isSubmit)
+                                                              ? Colors.grey
+                                                              : Colors.red
+                                                                  .shade900),
+                                            ),
+                                          ),
+                                          dropdownStyleData:
+                                              const DropdownStyleData(
+                                            maxHeight: 250,
+                                          ),
+                                          menuItemStyleData:
+                                              const MenuItemStyleData(
+                                            height: 40,
+                                          ),
+                                          dropdownSearchData:
+                                              DropdownSearchData(
+                                            searchController:
+                                                textEditingController,
+                                            searchInnerWidgetHeight: 50,
+                                            searchInnerWidget: Container(
+                                              height: 50,
+                                              padding: const EdgeInsets.only(
+                                                top: 8,
+                                                bottom: 4,
+                                                right: 8,
+                                                left: 8,
+                                              ),
+                                              child: TextFormField(
+                                                expands: true,
+                                                maxLines: null,
+                                                controller:
+                                                    textEditingController,
+                                                decoration: InputDecoration(
+                                                  isDense: true,
+                                                  contentPadding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 8,
+                                                  ),
+                                                  hintText:
+                                                      'Search for an item...',
+                                                  hintStyle: const TextStyle(
+                                                      fontSize: 16),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            searchMatchFn: (item, searchValue) {
+                                              return item.value
+                                                  .toString()
+                                                  .toLowerCase()
+                                                  .contains(searchValue
+                                                      .toLowerCase());
+                                            },
+                                          ),
+                                          //This to clear the search value when you close the menu
+                                          onMenuStateChange: (isOpen) {
+                                            if (!isOpen) {
+                                              textEditingController.clear();
+                                            }
+                                          },
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                searchMatchFn: (item, searchValue) {
-                                  return item.value
-                                      .toString()
-                                      .toLowerCase()
-                                      .contains(searchValue.toLowerCase());
-                                },
-                              ),
-                              //This to clear the search value when you close the menu
-                              onMenuStateChange: (isOpen) {
-                                if (!isOpen) {
-                                  textEditingController.clear();
-                                }
-                              },
+                                    //const SizedBox(height: 5.0),
+                                    state.hasError
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 5.0, left: 12.0),
+                                            child: Text(
+                                              state.errorText.toString(),
+                                              style: TextStyle(
+                                                  color: Colors.red.shade900,
+                                                  fontSize: 12.0),
+                                            ),
+                                          )
+                                        : const SizedBox(),
+                                  ],
+                                );
+                              }),
                             ),
-                          ),
+                          )
                         ],
                       ),
                       Expanded(
                         child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            SizedBox(
-                              height: 50,
-                              width: 100,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        10), // Corner radius
-                                  ), // Text color
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: SizedBox(
+                                height: 40,
+                                width: 100,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          10), // Corner radius
+                                    ), // Text color
+                                  ),
+                                  onPressed: () {
+                                    // TODO: add new company API call from here
+                                    openDialog();
+                                  },
+                                  child: const Text("+ New"),
                                 ),
-                                onPressed: () {
-                                  // TODO: add new company API call from here
-                                  openDialog();
-                                },
-                                child: const Text("+ New"),
                               ),
                             ),
                           ],
@@ -513,12 +689,17 @@ class _HomePageState extends State<HomePage> {
       print("-------------------------\n$reqBody\n-------------------------");
       setState(() {
         selectedValue = null;
+        isSubmit = false;
       });
       datePickController.clear();
       timeFromPickController.clear();
       timeToPickController.clear();
     } else {
-      if (selectedValue == null) setState(() => isSubmit = true);
+      if (selectedValue == null) {
+        setState(() => isSubmit = true);
+      } else {
+        setState(() => isSubmit = false);
+      }
       return;
     }
   }
