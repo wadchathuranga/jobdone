@@ -1,6 +1,7 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jobdone/services/jobService.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key, required this.title}) : super(key: key);
@@ -44,6 +45,12 @@ class _HomePageState extends State<HomePage> {
     fromTime = TimeOfDay.fromDateTime(date);
     toTime = TimeOfDay.fromDateTime(date);
     addNewCompanyController = TextEditingController();
+    getAllJobs();
+  }
+
+  void getAllJobs() async {
+    var res = await JobApiService.getAllJobsFromDB();
+    print('=================**********************$res');
   }
 
   @override
@@ -680,13 +687,19 @@ class _HomePageState extends State<HomePage> {
   Future saveData() async {
     if (_formKey.currentState!.validate()) {
       print("Form Validated");
+
+      // API call from here
       final reqBody = {
         "company": selectedValue,
         "date": datePickController.text,
         "timeFrom": timeFromPickController.text,
         "timeTo": timeToPickController.text,
       };
-      print("-------------------------\n$reqBody\n-------------------------");
+
+      bool isSave = await JobApiService.saveJobToDB(reqBody);
+      print("===========----------------------${isSave}");
+
+      return; // ========================= remove api set up completed
       setState(() {
         selectedValue = null;
         isSubmit = false;

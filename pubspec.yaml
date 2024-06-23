@@ -38,6 +38,8 @@ dependencies:
 
   dropdown_button2: ^2.3.8   # For searchable dropdown button
   intl: ^0.19.0   # To change date & time format
+  http: ^1.2.1   # To manage Rest API calls
+  dio: ^5.4.3+1   # To manage Rest API calls (instead of 'http')
 
 dev_dependencies:
   flutter_test:
