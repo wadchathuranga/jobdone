@@ -18,10 +18,24 @@ class _CalenderScreenState extends State<CalenderScreen> {
           dataSource: MeetingDataSource(_getDataSource()),
           // monthViewSettings: const MonthViewSettings(showAgenda: true),
           monthViewSettings: const MonthViewSettings(
+            showAgenda: true,
             appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
           ),
-          onTap: (data) {
-            print(data.appointments);
+          onTap: (CalendarTapDetails details) {
+            print(details.targetElement);
+            if (details.targetElement == CalendarElement.calendarCell) {
+              final DateTime selectedDate = details.date!;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Tapped on date: $selectedDate')),
+              );
+            } else if (details.targetElement == CalendarElement.appointment) {
+              final Meeting meeting = details.appointments!.first;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                    content:
+                        Text('Tapped on appointment: ${meeting.eventName}')),
+              );
+            }
           },
         ),
       ),
@@ -30,12 +44,27 @@ class _CalenderScreenState extends State<CalenderScreen> {
 
   List<Meeting> _getDataSource() {
     final List<Meeting> meetings = <Meeting>[];
-    final DateTime today = DateTime.now().add(const Duration(days: 5));
+    final DateTime today = DateTime.now().add(const Duration(days: 3));
     final DateTime startTime =
         DateTime(today.year, today.month, today.day, 9, 0, 0);
     final DateTime endTime = startTime.add(const Duration(hours: 2));
-    meetings.add(Meeting(
-        'Conference', startTime, endTime, const Color(0xFF0F8644), false));
+    meetings.add(
+      Meeting(
+          'Conference',
+          DateTime(today.year, today.month, today.day + 1, 9, 0, 0),
+          startTime.add(const Duration(hours: 1)),
+          const Color(0xFF0F8644),
+          false),
+    );
+    meetings.add(
+      Meeting('Meeting', startTime, endTime, const Color(0xFF0F8644), false),
+    );
+    meetings.add(
+      Meeting('Meeting', startTime, endTime, const Color(0xFF0F8644), false),
+    );
+    meetings.add(
+      Meeting('Meeting', startTime, endTime, const Color(0xFF0F8644), false),
+    );
     return meetings;
   }
 }
