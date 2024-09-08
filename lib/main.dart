@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jobdone/pages/calender_screen/CalenderScreen.dart';
 import 'package:jobdone/pages/home_page/HomePage.dart';
 
 void main() {
@@ -17,7 +18,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
       ),
-      home: const HomePage(title: 'Job Done'),
+      // home: const HomePage(title: 'Job Done'),
+      home: const CalenderScreen(),
     );
   }
 }

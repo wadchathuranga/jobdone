@@ -41,6 +41,8 @@ dependencies:
   http: ^1.2.1   # To manage Rest API calls
   dio: ^5.4.3+1   # To manage Rest API calls (instead of 'http')
 
+  syncfusion_flutter_calendar: ^26.2.13
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
