@@ -15,7 +15,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
       body: SafeArea(
         child: SfCalendar(
           view: CalendarView.month,
-          dataSource: MeetingDataSource(_getDataSource()),
+          dataSource: JobDataSource(_getDataSource()),
           // monthViewSettings: const MonthViewSettings(showAgenda: true),
           monthViewSettings: const MonthViewSettings(
             showAgenda: true,
@@ -29,11 +29,10 @@ class _CalenderScreenState extends State<CalenderScreen> {
                 SnackBar(content: Text('Tapped on date: $selectedDate')),
               );
             } else if (details.targetElement == CalendarElement.appointment) {
-              final Meeting meeting = details.appointments!.first;
+              final Job job = details.appointments!.first;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content:
-                        Text('Tapped on appointment: ${meeting.eventName}')),
+                    content: Text('Tapped on appointment: ${job.eventName}')),
               );
             }
           },
@@ -42,35 +41,51 @@ class _CalenderScreenState extends State<CalenderScreen> {
     );
   }
 
-  List<Meeting> _getDataSource() {
-    final List<Meeting> meetings = <Meeting>[];
+  List<Job> _getDataSource() {
+    final List<Job> Jobs = <Job>[];
     final DateTime today = DateTime.now().add(const Duration(days: 3));
-    final DateTime startTime =
-        DateTime(today.year, today.month, today.day, 9, 0, 0);
-    final DateTime endTime = startTime.add(const Duration(hours: 2));
-    meetings.add(
-      Meeting(
-          'Conference',
-          DateTime(today.year, today.month, today.day + 1, 9, 0, 0),
-          startTime.add(const Duration(hours: 1)),
+    // final DateTime startTime =
+    //     DateTime(today.year, today.month, today.day, 9, 0, 0);
+    // final DateTime endTime = startTime.add(const Duration(hours: 2));
+    Jobs.add(
+      Job(
+        'Conference',
+        DateTime(today.year, today.month, today.day - 2, 9, 0, 0),
+        DateTime(today.year, today.month, today.day - 2, 10, 30, 0),
+        const Color(0xFF0F8644),
+        false,
+      ),
+    );
+    Jobs.add(
+      Job(
+          'JOB4',
+          DateTime(today.year, today.month, today.day, 9, 0, 0),
+          DateTime(today.year, today.month, today.day, 10, 0, 0),
           const Color(0xFF0F8644),
           false),
     );
-    meetings.add(
-      Meeting('Meeting', startTime, endTime, const Color(0xFF0F8644), false),
+    Jobs.add(
+      Job(
+          'JOB5',
+          DateTime(today.year, today.month, today.day, 10, 0, 0),
+          DateTime(today.year, today.month, today.day, 11, 0, 0),
+          const Color(0xFF0F8644),
+          false),
     );
-    meetings.add(
-      Meeting('Meeting', startTime, endTime, const Color(0xFF0F8644), false),
+    Jobs.add(
+      Job(
+          'JOB7',
+          DateTime(today.year, today.month, today.day, 11, 0, 0),
+          DateTime(today.year, today.month, today.day, 12, 0, 0),
+          const Color(0xFF0F8644),
+          false),
     );
-    meetings.add(
-      Meeting('Meeting', startTime, endTime, const Color(0xFF0F8644), false),
-    );
-    return meetings;
+    return Jobs;
   }
 }
 
-class MeetingDataSource extends CalendarDataSource {
-  MeetingDataSource(List<Meeting> source) {
+class JobDataSource extends CalendarDataSource {
+  JobDataSource(List<Job> source) {
     appointments = source;
   }
 
@@ -100,8 +115,8 @@ class MeetingDataSource extends CalendarDataSource {
   }
 }
 
-class Meeting {
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
+class Job {
+  Job(this.eventName, this.from, this.to, this.background, this.isAllDay);
 
   String eventName;
   DateTime from;
