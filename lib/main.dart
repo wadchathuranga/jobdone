@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:jobdone/pages/calender_screen/CalenderScreen.dart';
-import 'package:jobdone/pages/home_page/HomePage.dart';
+import './Components/Calender/CalenderScreen.dart';
+import 'Databases/db_helper.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  await DatabaseHelper.db();
   runApp(const MyApp());
 }
 
