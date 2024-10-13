@@ -183,7 +183,8 @@ class BargeAllocationDB {
           'jobID',
           'jobNo',
           'assignedFromDateTime',
-          'assignedToDateTime'
+          'assignedToDateTime',
+          'vesselName'
         ],
       );
 

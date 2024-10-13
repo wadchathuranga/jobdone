@@ -96,7 +96,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
     for (var job in jobsList) {
       Jobs.add(
         Job(
-          job['jobNo'],
+          '${job['jobNo']} - ${job['vesselName']}',
           DateTime(
               DateTime.parse(job['assignedFromDateTime']).year,
               DateTime.parse(job['assignedFromDateTime']).month,
