@@ -21,10 +21,10 @@ class BargeAllocationDB {
       await db
           .rawDelete('DELETE FROM $tblBargeAllocation')
           .then((onValue) async {
-        print('=== DELETE JOB ALLOCATION TABLE DATA ===');
+        print('=== JOB ALLOCATION TABLE DATA DELETED ===');
 
         await db.rawDelete('DELETE FROM $tblJobItem').then((onValue) async {
-          print('=== DELETE JOB ITEM TABLE DATA ===');
+          print('=== JOB ITEM TABLE DATA DELETED ===');
 
           for (var jobAllocation in jobAllocationList) {
             await db.transaction((txn) async {
@@ -188,27 +188,70 @@ class BargeAllocationDB {
         ],
       );
 
-      if (bargeAllocationList.isNotEmpty) {
-        for (int i = 0; i < bargeAllocationList.length; i++) {
+      // ===== Temporary commented because no need to this items data to calender ======
+      // if (bargeAllocationList.isNotEmpty) {
+      //   for (int i = 0; i < bargeAllocationList.length; i++) {
+      //     Map<String, dynamic> newMap =
+      //         Map<String, dynamic>.from(bargeAllocationList[i]);
+      //     print(newMap);
+      //     jobAllocationList.add(newMap);
+      //
+      //     List<Map<String, dynamic>> jobItems = await db.query(
+      //       tblJobItem,
+      //       //columns: ['otherData'],  // Specify the needed columns
+      //       where: 'jobID = ?',
+      //       whereArgs: [bargeAllocationList[i]['jobID']],
+      //     );
+      //     // bind the job items to main list
+      //     print(jobItems);
+      //     jobAllocationList[i]['jobItems'] = jobItems;
+      //   }
+      // }
+      print('====== ALL DATA FETCHES ====== \n$bargeAllocationList');
+      return bargeAllocationList;
+    } catch (err) {
+      print(err.toString());
+      throw Exception(err.toString());
+    }
+  }
+
+  static Future<List> getJobListByDate(String selectedDate) async {
+    try {
+      var jobList = [];
+      final db = await DatabaseHelper.db();
+      List<Map<String, dynamic>> allocatedJobList =
+          await db.query(tblBargeAllocation,
+              columns: [
+                'jobID',
+                'jobNo',
+                'assignedFromDateTime',
+                'assignedToDateTime',
+                'vesselName',
+                'customerName'
+              ],
+              where: 'assignedFromDateTime=? AND assignedToDateTime=?',
+              whereArgs: [selectedDate.toString(), selectedDate.toString()]);
+
+      if (allocatedJobList.isNotEmpty) {
+        for (int i = 0; i < allocatedJobList.length; i++) {
           Map<String, dynamic> newMap =
-              Map<String, dynamic>.from(bargeAllocationList[i]);
+              Map<String, dynamic>.from(allocatedJobList[i]);
           print(newMap);
-          jobAllocationList.add(newMap);
+          jobList.add(newMap);
 
           List<Map<String, dynamic>> jobItems = await db.query(
             tblJobItem,
-            //columns: ['otherData'],  // Specify the needed columns
             where: 'jobID = ?',
-            whereArgs: [bargeAllocationList[i]['jobID']],
+            whereArgs: [allocatedJobList[i]['jobID']],
           );
           // bind the job items to main list
           print(jobItems);
-          jobAllocationList[i]['jobItems'] = jobItems;
+          jobList[i]['jobItems'] = jobItems;
         }
       }
 
-      print('====== ALL DATA FETCHES ====== \n$jobAllocationList');
-      return bargeAllocationList;
+      print('====== JOB LIST FETCHES ====== \n$jobList');
+      return jobList;
     } catch (err) {
       print(err.toString());
       throw Exception(err.toString());

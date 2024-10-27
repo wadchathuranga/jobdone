@@ -5,10 +5,12 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../Databases/bargeAllocation_queries.dart';
 import '../../services/jobService.dart';
+import '../../services/locationAndBerthedTypeService.dart';
 import '../job_screen/JobScreen.dart';
 
 class CalenderScreen extends StatefulWidget {
@@ -27,6 +29,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
     super.initState();
 
     getBargeAllocationData();
+    getPortLocationsData();
+    getBerthedTypesData();
 
     //get data from DB after saving
     getBargeAllocationForCalenderFromDB();
@@ -41,19 +45,37 @@ class _CalenderScreenState extends State<CalenderScreen> {
             : SfCalendar(
                 view: CalendarView.month,
                 dataSource: JobDataSource(_getDataSource()),
-                monthViewSettings: MonthViewSettings(
+                monthViewSettings: const MonthViewSettings(
                   showAgenda: true,
-                  // agendaStyle: AgendaStyle(),
-                  // showTrailingAndLeadingDates: false,
+                  //agendaItemHeight: 50,
+                  //agendaStyle: AgendaStyle()
+                  //monthCellStyle: MonthCellStyle(),
+                  numberOfWeeksInView: 6,
+                  //showTrailingAndLeadingDates: false,
                   appointmentDisplayMode:
                       MonthAppointmentDisplayMode.appointment,
                 ),
                 onTap: (CalendarTapDetails details) {
-                  print(details.targetElement);
+                  DateTime cellDate = details.date!; // read cell date
+                  print('=====${details.targetElement}');
                   if (details.targetElement == CalendarElement.calendarCell) {
-                    // setState(() {
-                    //
-                    // });
+                    List? jobs = details
+                        .appointments; // read appointments count on a selected day
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                            'Cell Date of Tapped on Cell: ${cellDate} \nCount: ${jobs!.length}'),
+                      ),
+                    );
+
+                    if (details.appointments!.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                JobScreen(selectedDate: cellDate)),
+                      );
+                    }
                   } else if (details.targetElement ==
                       CalendarElement.appointment) {
                     final Job job = details.appointments!.first;
@@ -64,11 +86,14 @@ class _CalenderScreenState extends State<CalenderScreen> {
                       ),
                     );
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const JobScreen()),
-                    );
+                    if (details.appointments!.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                JobScreen(selectedDate: cellDate)),
+                      );
+                    }
                   }
                 },
               ),
@@ -76,9 +101,24 @@ class _CalenderScreenState extends State<CalenderScreen> {
     );
   }
 
+  void getPortLocationsData() async {
+    var locationList = jsonDecode(await LocationAndBerthedTypeApiService
+        .getPortLocationCodeListFromServer())['result'];
+
+    LocationAndBerthedTypeDB.saveLocationListToDB(locationList);
+  }
+
+  void getBerthedTypesData() async {
+    var berthedTypeList = jsonDecode(await LocationAndBerthedTypeApiService
+        .getBerthedTypeListFromServer())['result'];
+
+    LocationAndBerthedTypeDB.saveBerthedTypeListToDB(berthedTypeList);
+  }
+
   void getBargeAllocationData() async {
     var jobAllocationList = jsonDecode(
         await JobApiService.getBargeAllocationListFromServer())['result'];
+    jobsList = jobAllocationList;
     setState(() {});
 
     BargeAllocationDB.saveBargeAllocationListToDB(jobAllocationList);
@@ -91,7 +131,6 @@ class _CalenderScreenState extends State<CalenderScreen> {
 
   List<Job> _getDataSource() {
     final List<Job> Jobs = <Job>[];
-    final DateTime today = DateTime.now().add(const Duration(days: 3));
 
     for (var job in jobsList) {
       Jobs.add(
@@ -108,7 +147,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
               DateTime.parse(job['assignedToDateTime']).year,
               DateTime.parse(job['assignedToDateTime']).month,
               DateTime.parse(job['assignedToDateTime']).day,
-              11,
+              23,
               59,
               0),
           const Color(0xFF0F8644),
@@ -116,43 +155,6 @@ class _CalenderScreenState extends State<CalenderScreen> {
         ),
       );
     }
-
-    // Jobs.add(
-    //   Job(
-    //     'jobsList',
-    //     DateTime(today.year, today.month, today.day - 2, 0, 0, 0),
-    //     DateTime(today.year, today.month, today.day - 2, 0, 30, 0),
-    //     const Color(0xFF0F8644),
-    //     false,
-    //   ),
-    // );
-    //
-    // Jobs.add(
-    //   Job(
-    //       'JOB4',
-    //       DateTime(today.year, today.month, today.day, 0, 0, 0),
-    //       DateTime(today.year, today.month, today.day, 23, 59, 0),
-    //       const Color(0xFF0F8644),
-    //       false),
-    // );
-    //
-    // Jobs.add(
-    //   Job(
-    //       'JOB5',
-    //       DateTime(today.year, today.month, today.day, 0, 0, 0),
-    //       DateTime(today.year, today.month, today.day, 23, 59, 0),
-    //       const Color(0xFF0F8644),
-    //       false),
-    // );
-    //
-    // Jobs.add(
-    //   Job(
-    //       'JOB7',
-    //       DateTime(today.year, today.month, today.day, 0, 0, 0),
-    //       DateTime(today.year, today.month, today.day, 23, 59, 0),
-    //       const Color(0xFF0F8644),
-    //       false),
-    // );
     return Jobs;
   }
 }

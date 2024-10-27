@@ -12,8 +12,8 @@ class DatabaseHelper {
   static const String tblSealNos = 'SealNos_table';
   static const String tblBargeAllocation = 'BargeAllocation_table';
   static const String tblJobItem = 'JobItem_table';
-  static const String tblPortOfDelivery = 'PortOfDelivery_table';
-  static const String tblLocationOfSupply = 'LocationOfSupply_table';
+  static const String tblLocations = 'Location_table';
+  static const String tblBerthedTypes = 'BerthedType_table';
   static const String tblBargePara = 'BargePara_table';
 
   // Columns Names
@@ -135,7 +135,7 @@ class DatabaseHelper {
     ''');
 
     await database.execute('''
-        CREATE TABLE $tblPortOfDelivery(
+        CREATE TABLE $tblLocations(
           $col_id INTEGER PRIMARY KEY AUTOINCREMENT,
           varLocationCode TEXT NULL,
           varLocationName TEXT NULL,
@@ -145,7 +145,7 @@ class DatabaseHelper {
     ''');
 
     await database.execute('''
-        CREATE TABLE $tblLocationOfSupply(
+        CREATE TABLE $tblBerthedTypes(
           $col_id INTEGER PRIMARY KEY AUTOINCREMENT,
           varBerthedTypeCode TEXT NULL,
           varBerthedTypeName TEXT NULL,
