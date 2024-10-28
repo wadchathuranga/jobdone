@@ -39,6 +39,9 @@ class _CalenderScreenState extends State<CalenderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Job Calender'),
+      ),
       body: SafeArea(
         child: jobsList.isEmpty
             ? const Center(child: CircularProgressIndicator())
@@ -46,7 +49,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
                 view: CalendarView.month,
                 dataSource: JobDataSource(_getDataSource()),
                 monthViewSettings: const MonthViewSettings(
-                  showAgenda: true,
+                  appointmentDisplayCount: 5,
+                  //showAgenda: true,
                   //agendaItemHeight: 50,
                   //agendaStyle: AgendaStyle()
                   //monthCellStyle: MonthCellStyle(),
