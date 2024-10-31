@@ -4,12 +4,14 @@ class LocationAndBerthedTypeApiService {
   static String BASE_URL =
       'https://logixbmsmob.advantis.world/BMSAppUATAPI/api';
 
+  static String token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ikt1bWFuYSIsInVzZXJJZCI6IjkiLCJhZ2VuY3lJRCI6IjEiLCJjb21wYW55SUQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMwMzUzNjkzLCJleHAiOjE3MzA0NDAwOTMsImlhdCI6MTczMDM1MzY5M30._5rkxiYbTktAVeOkiNYXZnxREsXQeeXT34cak6vy6KE';
+
   static Future getPortLocationCodeListFromServer() async {
     try {
       Uri url = Uri.parse('$BASE_URL/BDN/GetLocations?bitActive=true');
       final response = await http.get(url, headers: {
         'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ikt1bWFuYSIsInVzZXJJZCI6IjkiLCJhZ2VuY3lJRCI6IjEiLCJjb21wYW55SUQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMwMDM3Mzc2LCJleHAiOjE3MzAxMjM3NzYsImlhdCI6MTczMDAzNzM3Nn0.J_JZ0s5zuEgSByNCqm35FQUfxoBQUWrUnFE2LHsqu2A'
+            'Bearer $token'
       });
 
       if (response.statusCode == 200) {
@@ -29,7 +31,7 @@ class LocationAndBerthedTypeApiService {
       Uri url = Uri.parse('$BASE_URL/BDN/GetBerthTypes?bitActive=true');
       final response = await http.get(url, headers: {
         'Authorization':
-            'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ikt1bWFuYSIsInVzZXJJZCI6IjkiLCJhZ2VuY3lJRCI6IjEiLCJjb21wYW55SUQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMwMDM3Mzc2LCJleHAiOjE3MzAxMjM3NzYsImlhdCI6MTczMDAzNzM3Nn0.J_JZ0s5zuEgSByNCqm35FQUfxoBQUWrUnFE2LHsqu2A'
+            'Bearer $token'
       });
 
       if (response.statusCode == 200) {

@@ -40,7 +40,10 @@ class _CalenderScreenState extends State<CalenderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Job Calender'),
+        title: const Text('KUMANA - Job Calender'),
+        actions: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.logout_outlined))
+        ],
       ),
       body: SafeArea(
         child: jobsList.isEmpty

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 
 import '../../core/stylesAndFormatting.dart';
@@ -22,6 +23,16 @@ class _BDNScreenState extends State<BDNScreen> {
   var selectedPortOfDelivery;
   var selectedLocationOfSupply;
 
+  final TextEditingController _dateOfAlongSide = TextEditingController();
+  final TextEditingController _timeOfAlongSide = TextEditingController();
+  final TextEditingController _dateOfCommencedPumping = TextEditingController();
+  final TextEditingController _timeOfCommencedPumping = TextEditingController();
+  final TextEditingController _dateOfCompletePumping = TextEditingController();
+  final TextEditingController _timeOfCompletePumping = TextEditingController();
+
+  late DateTime date;
+  late TimeOfDay time;
+
   // final List portOfDeliveryList = [
   //   "LKCMB | Colombo",
   //   "DUTRR | Trincomalle",
@@ -33,6 +44,17 @@ class _BDNScreenState extends State<BDNScreen> {
   @override
   void initState() {
     super.initState();
+    date = DateTime.now();
+    time = TimeOfDay.now();
+
+    _dateOfAlongSide.text = DateFormat('yyyy-MM-dd').format(date);
+    _timeOfAlongSide.text = DateFormat('yyyy-MM-dd').format(date);
+
+    _dateOfCommencedPumping.text = DateFormat('yyyy-MM-dd').format(date);
+    _timeOfCommencedPumping.text = DateFormat('yyyy-MM-dd').format(date);
+
+    _dateOfCompletePumping.text = DateFormat('yyyy-MM-dd').format(date);
+    _timeOfCompletePumping.text = DateFormat('yyyy-MM-dd').format(date);
 
     getLocationList();
     getBerthedTypeList();
@@ -371,7 +393,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       child: TextFormField(
                         maxLines: maxLines(),
                         minLines: minLines(),
-                        // controller: _propertyAddressController,
                         decoration: customInputDecoration('Date'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -379,6 +400,15 @@ class _BDNScreenState extends State<BDNScreen> {
                           } else {
                             return null;
                           }
+                        },
+                        readOnly: true,
+                        controller: _dateOfAlongSide,
+                        onTap: () async {
+                          DateTime selectedDate = await pickDate();
+                          setState(() {
+                            _dateOfAlongSide.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                          });
+                          FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -400,6 +430,15 @@ class _BDNScreenState extends State<BDNScreen> {
                           } else {
                             return null;
                           }
+                        },
+                        readOnly: true,
+                        controller: _timeOfAlongSide,
+                        onTap: () async {
+                          DateTime selectedDate = await pickTime();
+                          setState(() {
+                            _timeOfAlongSide.text = DateFormat('HH:mm').format(selectedDate);
+                          });
+                          FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -431,6 +470,15 @@ class _BDNScreenState extends State<BDNScreen> {
                             return null;
                           }
                         },
+                        readOnly: true,
+                        controller: _dateOfCommencedPumping,
+                        onTap: () async {
+                          DateTime selectedDate = await pickDate();
+                          setState(() {
+                            _dateOfCommencedPumping.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                          });
+                          FocusScope.of(context).requestFocus(FocusNode());
+                        },
                         onTapOutside: (PointerDownEvent val) {
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -443,7 +491,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       child: TextFormField(
                         maxLines: maxLines(),
                         minLines: minLines(),
-                        // controller: _propertyAddressController,
                         decoration: customInputDecoration('Time'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -451,6 +498,15 @@ class _BDNScreenState extends State<BDNScreen> {
                           } else {
                             return null;
                           }
+                        },
+                        readOnly: true,
+                        controller: _timeOfCommencedPumping,
+                        onTap: () async {
+                          DateTime selectedDate = await pickTime();
+                          setState(() {
+                            _timeOfCommencedPumping.text = DateFormat('HH:mm').format(selectedDate);
+                          });
+                          FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -473,7 +529,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       child: TextFormField(
                         maxLines: maxLines(),
                         minLines: minLines(),
-                        // controller: _propertyAddressController,
                         decoration: customInputDecoration('Date'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -481,6 +536,15 @@ class _BDNScreenState extends State<BDNScreen> {
                           } else {
                             return null;
                           }
+                        },
+                        readOnly: true,
+                        controller: _dateOfCompletePumping,
+                        onTap: () async {
+                          DateTime selectedDate = await pickDate();
+                          setState(() {
+                            _dateOfCompletePumping.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                          });
+                          FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -494,7 +558,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       child: TextFormField(
                         maxLines: maxLines(),
                         minLines: minLines(),
-                        // controller: _propertyAddressController,
                         decoration: customInputDecoration('Time'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -502,6 +565,15 @@ class _BDNScreenState extends State<BDNScreen> {
                           } else {
                             return null;
                           }
+                        },
+                        readOnly: true,
+                        controller: _timeOfCompletePumping,
+                        onTap: () async {
+                          DateTime selectedDate = await pickTime();
+                          setState(() {
+                            _timeOfCompletePumping.text = DateFormat('HH:mm').format(selectedDate);
+                          });
+                          FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
                           FocusScope.of(context).requestFocus(FocusNode());
@@ -570,4 +642,34 @@ class _BDNScreenState extends State<BDNScreen> {
       ),
     );
   }
+
+  // Date picker function
+  Future<DateTime> pickDate() async {
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: date,
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime(DateTime.now().year + 5),
+    );
+    if (newDate == null) {
+      return date;
+    } else {
+      return newDate;
+    }
+  }
+
+  // Date picker function
+  Future<DateTime> pickTime() async {
+    final newTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (newTime == null) {
+      return DateTime(date.year, date.month, date.day, date.hour, date.minute, 0, 0, 0);
+    } else {
+      return DateTime(date.year, date.month, date.day, newTime.hour, newTime.minute, 0, 0, 0);
+    }
+  }
+
+
 }
