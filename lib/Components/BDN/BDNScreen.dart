@@ -17,21 +17,47 @@ class _BDNScreenState extends State<BDNScreen> {
   int currentStep = 0;
   bool isCompleted = false;
 
+  ///===================== Step 01 - Delivery Note =====================///
   late List portOfDeliveryList = [];
-  late List locationOfSupplyList = [];
-
   var selectedPortOfDelivery;
+
+  late List locationOfSupplyList = [];
   var selectedLocationOfSupply;
 
-  final TextEditingController _dateOfAlongSide = TextEditingController();
-  final TextEditingController _timeOfAlongSide = TextEditingController();
-  final TextEditingController _dateOfCommencedPumping = TextEditingController();
-  final TextEditingController _timeOfCommencedPumping = TextEditingController();
-  final TextEditingController _dateOfCompletePumping = TextEditingController();
-  final TextEditingController _timeOfCompletePumping = TextEditingController();
+  final TextEditingController _dateOfAlongSideController =
+      TextEditingController();
+  final TextEditingController _timeOfAlongSideController =
+      TextEditingController();
+  final TextEditingController _dateOfCommencedPumpingController =
+      TextEditingController();
+  final TextEditingController _timeOfCommencedPumpingController =
+      TextEditingController();
+  final TextEditingController _dateOfCompletePumpingController =
+      TextEditingController();
+  final TextEditingController _timeOfCompletePumpingController =
+      TextEditingController();
 
   late DateTime date;
-  late TimeOfDay time;
+
+  ///===================== Step 02 - Fuel Characteristics =====================///
+  late List productList = [];
+  var selectedProduct;
+
+  final TextEditingController _viscocityController = TextEditingController();
+  final TextEditingController _waterContentController = TextEditingController();
+  final TextEditingController _sulphurContentController =
+      TextEditingController();
+  final TextEditingController _densityController = TextEditingController();
+  final TextEditingController _flashPointController = TextEditingController();
+
+  ///===================== Step 03 - Quantity =====================///
+  final TextEditingController _grossObservedVolumeController =
+      TextEditingController();
+  final TextEditingController _grossStandardVolumeController =
+      TextEditingController();
+  final TextEditingController _quantityMTController = TextEditingController();
+  final TextEditingController _barrelsAt60FController = TextEditingController();
+  final TextEditingController _temperatureController = TextEditingController();
 
   // final List portOfDeliveryList = [
   //   "LKCMB | Colombo",
@@ -39,25 +65,31 @@ class _BDNScreenState extends State<BDNScreen> {
   //   "LKGAL | Galle"
   // ];
 
-  // final List locationOfSupplyList = ["ANC", "IPL", "OPL"];
-
   @override
   void initState() {
     super.initState();
+
+    ///=== Step 01 - Delivery Note ===///
     date = DateTime.now();
-    time = TimeOfDay.now();
 
-    _dateOfAlongSide.text = DateFormat('yyyy-MM-dd').format(date);
-    _timeOfAlongSide.text = DateFormat('yyyy-MM-dd').format(date);
+    _dateOfAlongSideController.text = DateFormat('yyyy-MM-dd').format(date);
+    _timeOfAlongSideController.text = DateFormat('HH:mm').format(date);
 
-    _dateOfCommencedPumping.text = DateFormat('yyyy-MM-dd').format(date);
-    _timeOfCommencedPumping.text = DateFormat('yyyy-MM-dd').format(date);
+    _dateOfCommencedPumpingController.text =
+        DateFormat('yyyy-MM-dd').format(date);
+    _timeOfCommencedPumpingController.text = DateFormat('HH:mm').format(date);
 
-    _dateOfCompletePumping.text = DateFormat('yyyy-MM-dd').format(date);
-    _timeOfCompletePumping.text = DateFormat('yyyy-MM-dd').format(date);
+    _dateOfCompletePumpingController.text =
+        DateFormat('yyyy-MM-dd').format(date);
+    _timeOfCompletePumpingController.text = DateFormat('HH:mm').format(date);
 
     getLocationList();
     getBerthedTypeList();
+
+    ///=== Step 02 - Fuel Characteristics ===///
+    productList = widget.job['jobItems'];
+
+    ///=== Step 03 - Quantity ===///
   }
 
   void getLocationList() async {
@@ -70,28 +102,33 @@ class _BDNScreenState extends State<BDNScreen> {
     setState(() {});
   }
 
+  // void getProductList() async {
+  //   locationOfSupplyList = await LocationAndBerthedTypeDB.getAllBerthedType();
+  //   setState(() {});
+  // }
+
   List<Step> getSteps() => [
-        ///===================== General Information Info =====================///
+        ///===================== Step 01 - Delivery Note =====================///
         Step(
           isActive: currentStep >= 0,
           title: const Text('Delivery Note'),
           content: deliveryNote(),
         ),
 
-        ///===================== Details of Land Info =====================///
+        ///===================== Step 02 - Fuel Characteristics =====================///
         Step(
           isActive: currentStep >= 1,
           title: const Text('Fuel Characteristics'),
           content: fuelCharacteristics(),
         ),
 
-        // ///===================== Details of Structure Info =====================///
-        // Step(
-        //   isActive: currentStep >= 2,
-        //   title: const Text('Details of Structure'),
-        //   content: structureInfo(),
-        // ),
-        //
+        ///===================== Step 03 - Quantity =====================///
+        Step(
+          isActive: currentStep >= 2,
+          title: const Text('Quantity'),
+          content: quantity(),
+        ),
+
         // ///===================== Details of Valuation Info =====================///
         // Step(
         //   isActive: currentStep >= 3,
@@ -118,10 +155,12 @@ class _BDNScreenState extends State<BDNScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
+        // physics: const ScrollPhysics(),
         child: Column(
           children: [
             Stepper(
               type: StepperType.vertical,
+              physics: const ScrollPhysics(),
               steps: getSteps(),
               currentStep: currentStep,
               onStepTapped: (step) => setState(() => currentStep = step),
@@ -195,7 +234,7 @@ class _BDNScreenState extends State<BDNScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 5),
       child: Form(
-        // key: _genInfoFormKey,
+        // key: _deliveryNoteFormKey,
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
@@ -363,7 +402,6 @@ class _BDNScreenState extends State<BDNScreen> {
               readOnly: true,
               maxLines: maxLines(),
               minLines: minLines(),
-              // controller: _bankClientNameController,
               decoration: customInputDecoration('BDN Number'),
               validator: (val) {
                 if (val!.trim().isEmpty) {
@@ -372,6 +410,7 @@ class _BDNScreenState extends State<BDNScreen> {
                   return null;
                 }
               },
+              // controller: _bdnController,
               onTapOutside: (PointerDownEvent val) {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
@@ -402,11 +441,12 @@ class _BDNScreenState extends State<BDNScreen> {
                           }
                         },
                         readOnly: true,
-                        controller: _dateOfAlongSide,
+                        controller: _dateOfAlongSideController,
                         onTap: () async {
                           DateTime selectedDate = await pickDate();
                           setState(() {
-                            _dateOfAlongSide.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                            _dateOfAlongSideController.text =
+                                DateFormat('yyyy-MM-dd').format(selectedDate);
                           });
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -422,7 +462,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       child: TextFormField(
                         maxLines: maxLines(),
                         minLines: minLines(),
-                        // controller: _propertyAddressController,
                         decoration: customInputDecoration('Time'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -432,11 +471,12 @@ class _BDNScreenState extends State<BDNScreen> {
                           }
                         },
                         readOnly: true,
-                        controller: _timeOfAlongSide,
+                        controller: _timeOfAlongSideController,
                         onTap: () async {
                           DateTime selectedDate = await pickTime();
                           setState(() {
-                            _timeOfAlongSide.text = DateFormat('HH:mm').format(selectedDate);
+                            _timeOfAlongSideController.text =
+                                DateFormat('HH:mm').format(selectedDate);
                           });
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -461,7 +501,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       child: TextFormField(
                         maxLines: maxLines(),
                         minLines: minLines(),
-                        // controller: _propertyAddressController,
                         decoration: customInputDecoration('Date'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -471,11 +510,12 @@ class _BDNScreenState extends State<BDNScreen> {
                           }
                         },
                         readOnly: true,
-                        controller: _dateOfCommencedPumping,
+                        controller: _dateOfCommencedPumpingController,
                         onTap: () async {
                           DateTime selectedDate = await pickDate();
                           setState(() {
-                            _dateOfCommencedPumping.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                            _dateOfCommencedPumpingController.text =
+                                DateFormat('yyyy-MM-dd').format(selectedDate);
                           });
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -500,11 +540,12 @@ class _BDNScreenState extends State<BDNScreen> {
                           }
                         },
                         readOnly: true,
-                        controller: _timeOfCommencedPumping,
+                        controller: _timeOfCommencedPumpingController,
                         onTap: () async {
                           DateTime selectedDate = await pickTime();
                           setState(() {
-                            _timeOfCommencedPumping.text = DateFormat('HH:mm').format(selectedDate);
+                            _timeOfCommencedPumpingController.text =
+                                DateFormat('HH:mm').format(selectedDate);
                           });
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -538,11 +579,12 @@ class _BDNScreenState extends State<BDNScreen> {
                           }
                         },
                         readOnly: true,
-                        controller: _dateOfCompletePumping,
+                        controller: _dateOfCompletePumpingController,
                         onTap: () async {
                           DateTime selectedDate = await pickDate();
                           setState(() {
-                            _dateOfCompletePumping.text = DateFormat('yyyy-MM-dd').format(selectedDate);
+                            _dateOfCompletePumpingController.text =
+                                DateFormat('yyyy-MM-dd').format(selectedDate);
                           });
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -567,11 +609,12 @@ class _BDNScreenState extends State<BDNScreen> {
                           }
                         },
                         readOnly: true,
-                        controller: _timeOfCompletePumping,
+                        controller: _timeOfCompletePumpingController,
                         onTap: () async {
                           DateTime selectedDate = await pickTime();
                           setState(() {
-                            _timeOfCompletePumping.text = DateFormat('HH:mm').format(selectedDate);
+                            _timeOfCompletePumpingController.text =
+                                DateFormat('HH:mm').format(selectedDate);
                           });
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
@@ -594,51 +637,339 @@ class _BDNScreenState extends State<BDNScreen> {
   Widget fuelCharacteristics() {
     return Container(
       margin: const EdgeInsets.only(top: 5),
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            maxLines: maxLines(),
-            minLines: minLines(),
-            // controller: _neighborhoodController,
-            decoration: customInputDecoration('Neighborhood'),
-            validator: (val) {
-              if (val!.trim().isEmpty) {
-                return 'Required!';
-              } else {
-                return null;
-              }
-            },
-          ),
-          const SizedBox(height: 10),
-          TextFormField(
-            maxLines: maxLines(),
-            minLines: minLines(),
-            // controller: _otherBoundController,
-            decoration: customInputDecoration('Comments on Boundaries'),
-            validator: (val) {
-              if (val!.trim().isEmpty) {
-                return 'Required!';
-              } else {
-                return null;
-              }
-            },
-          ),
-          const SizedBox(height: 10),
-          TextFormField(
-            maxLines: maxLines(),
-            minLines: minLines(),
-            // controller: _landDescriptionController,
-            decoration: customInputDecoration('Land Description'),
-            validator: (val) {
-              if (val!.trim().isEmpty) {
-                return 'Required!';
-              } else {
-                return null;
-              }
-            },
-          ),
-          const SizedBox(height: 10),
-        ],
+      child: Form(
+        // key: _fuelCharacteristicsFormKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    validator: (val) {
+                      if (val == null) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    itemHeight: 50,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 15, vertical: 5),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      labelText: 'Product',
+                    ),
+                    items: productList.map((product) {
+                      return DropdownMenuItem(
+                        value: product['productCode'].toString(),
+                        child: Text(product['productCode'].toString()),
+                      );
+                    }).toList(),
+                    onChanged: (newValueSelected) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      setState(() {
+                        selectedProduct = newValueSelected!;
+                      });
+                    },
+                    value: selectedProduct,
+                    isExpanded: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Viscosity'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _viscocityController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Water Content'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _waterContentController,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Sulphur Content'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _sulphurContentController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Density'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _densityController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Flash Point'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _flashPointController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                const Flexible(
+                  flex: 1,
+                  child: SizedBox(),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget quantity() {
+    return Container(
+      margin: const EdgeInsets.only(top: 5),
+      child: Form(
+        // key: _quantityFormKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Gross Observed Volume'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _grossObservedVolumeController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Gross Standard Volume'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _grossStandardVolumeController,
+                    onTap: () async {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Quantity (Metric Tons)'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _quantityMTController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Barrels at 60F'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _barrelsAt60FController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: TextFormField(
+                    maxLines: maxLines(),
+                    minLines: minLines(),
+                    keyboardType: TextInputType.number,
+                    decoration:
+                        customInputDecoration('Temperature VCF and WCF'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _temperatureController,
+                    onTapOutside: (PointerDownEvent val) {
+                      FocusScope.of(context).requestFocus(FocusNode());
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                const Flexible(
+                  flex: 1,
+                  child: SizedBox(),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 5,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -665,11 +996,11 @@ class _BDNScreenState extends State<BDNScreen> {
       initialTime: TimeOfDay.now(),
     );
     if (newTime == null) {
-      return DateTime(date.year, date.month, date.day, date.hour, date.minute, 0, 0, 0);
+      return DateTime(
+          date.year, date.month, date.day, date.hour, date.minute, 0, 0, 0);
     } else {
-      return DateTime(date.year, date.month, date.day, newTime.hour, newTime.minute, 0, 0, 0);
+      return DateTime(date.year, date.month, date.day, newTime.hour,
+          newTime.minute, 0, 0, 0);
     }
   }
-
-
 }

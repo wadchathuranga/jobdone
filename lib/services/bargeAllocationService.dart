@@ -6,7 +6,8 @@ class JobApiService {
   static String BASE_URL =
       'https://logixbmsmob.advantis.world/BMSAppUATAPI/api';
 
-  static String token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ikt1bWFuYSIsInVzZXJJZCI6IjkiLCJhZ2VuY3lJRCI6IjEiLCJjb21wYW55SUQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMwMzUzNjkzLCJleHAiOjE3MzA0NDAwOTMsImlhdCI6MTczMDM1MzY5M30._5rkxiYbTktAVeOkiNYXZnxREsXQeeXT34cak6vy6KE';
+  static String token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ikt1bWFuYSIsInVzZXJJZCI6IjkiLCJhZ2VuY3lJRCI6IjEiLCJjb21wYW55SUQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMwNTI4NjkzLCJleHAiOjE3MzA2MTUwOTMsImlhdCI6MTczMDUyODY5M30.1rsZp4e-eQiOYfSisvFLtVoO_Alxg_tRYl5kzVlF868';
 
   static Future<bool> saveJobToDB(reqBody) async {
     try {
@@ -55,10 +56,8 @@ class JobApiService {
     try {
       Uri url = Uri.parse(
           '$BASE_URL/Home/getBargeAllocationCalenderDataOffline?userID=15');
-      final response = await http.get(url, headers: {
-        'Authorization':
-            'Bearer $token'
-      });
+      final response =
+          await http.get(url, headers: {'Authorization': 'Bearer $token'});
 
       if (response.statusCode == 200) {
         return response.body;

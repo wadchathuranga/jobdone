@@ -58,7 +58,7 @@ class _JobScreenState extends State<JobScreen> {
     );
   }
 
-  Widget _expandableTile(jobItem) {
+  Widget _expandableTile(job) {
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
       child: Column(
@@ -84,7 +84,7 @@ class _JobScreenState extends State<JobScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            jobItem['vesselName'],
+                            job['vesselName'],
                             style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -116,7 +116,7 @@ class _JobScreenState extends State<JobScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            BDNScreen(job: jobItem),
+                                            BDNScreen(job: job),
                                       ),
                                     );
                                   },
@@ -173,7 +173,7 @@ class _JobScreenState extends State<JobScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      jobItem['jobNo'],
+                                      job['jobNo'],
                                       style: const TextStyle(fontSize: 16),
                                     ),
                                   ],
@@ -186,7 +186,7 @@ class _JobScreenState extends State<JobScreen> {
                             Row(
                               children: [
                                 Text(
-                                    'From: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(jobItem['assignedFromDateTime']).year, DateTime.parse(jobItem['assignedFromDateTime']).month, DateTime.parse(jobItem['assignedFromDateTime']).day, 0, 0, 0)).toString()}   -   To: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(jobItem['assignedToDateTime']).year, DateTime.parse(jobItem['assignedToDateTime']).month, DateTime.parse(jobItem['assignedToDateTime']).day, 23, 59, 0)).toString()}'),
+                                    'From: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedFromDateTime']).year, DateTime.parse(job['assignedFromDateTime']).month, DateTime.parse(job['assignedFromDateTime']).day, 0, 0, 0)).toString()}   -   To: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedToDateTime']).year, DateTime.parse(job['assignedToDateTime']).month, DateTime.parse(job['assignedToDateTime']).day, 23, 59, 0)).toString()}'),
                               ],
                             ),
                             const SizedBox(
@@ -252,7 +252,7 @@ class _JobScreenState extends State<JobScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      jobItem['jobNo'],
+                                      job['jobNo'],
                                       style: const TextStyle(fontSize: 16),
                                     ),
                                   ],
@@ -265,7 +265,7 @@ class _JobScreenState extends State<JobScreen> {
                             Row(
                               children: [
                                 Text(
-                                    'From: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(jobItem['assignedFromDateTime']).year, DateTime.parse(jobItem['assignedFromDateTime']).month, DateTime.parse(jobItem['assignedFromDateTime']).day, 0, 0, 0)).toString()}   -   To: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(jobItem['assignedToDateTime']).year, DateTime.parse(jobItem['assignedToDateTime']).month, DateTime.parse(jobItem['assignedToDateTime']).day, 23, 59, 0)).toString()}'),
+                                    'From: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedFromDateTime']).year, DateTime.parse(job['assignedFromDateTime']).month, DateTime.parse(job['assignedFromDateTime']).day, 0, 0, 0)).toString()}   -   To: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedToDateTime']).year, DateTime.parse(job['assignedToDateTime']).month, DateTime.parse(job['assignedToDateTime']).day, 23, 59, 0)).toString()}'),
                               ],
                             ),
                             const SizedBox(
@@ -319,7 +319,7 @@ class _JobScreenState extends State<JobScreen> {
                                     ),
                                   ],
                                 ),
-                                ...jobItem['jobItems'].map((item) {
+                                ...job['jobItems'].map((item) {
                                   return _tableRow(item);
                                 }),
                               ],

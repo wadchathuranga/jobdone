@@ -9,7 +9,7 @@ import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../Databases/bargeAllocation_queries.dart';
-import '../../services/jobService.dart';
+import '../../services/bargeAllocationService.dart';
 import '../../services/locationAndBerthedTypeService.dart';
 import '../job_screen/JobScreen.dart';
 
