@@ -3,17 +3,18 @@ import 'package:intl/intl.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 
 import '../../core/stylesAndFormatting.dart';
+import 'BDNProcessScreen.dart';
 
-class BDNScreen extends StatefulWidget {
-  const BDNScreen({super.key, required this.job});
+class BDNIssueScreen extends StatefulWidget {
+  const BDNIssueScreen({super.key, required this.job});
 
   final dynamic job;
 
   @override
-  State<BDNScreen> createState() => _BDNScreenState();
+  State<BDNIssueScreen> createState() => _BDNIssueScreenState();
 }
 
-class _BDNScreenState extends State<BDNScreen> {
+class _BDNIssueScreenState extends State<BDNIssueScreen> {
   int currentStep = 0;
   bool isCompleted = false;
 
@@ -237,6 +238,9 @@ class _BDNScreenState extends State<BDNScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('BDN Issue'),
+      ),
       body: SingleChildScrollView(
         // physics: const ScrollPhysics(),
         child: Column(
@@ -246,22 +250,48 @@ class _BDNScreenState extends State<BDNScreen> {
               physics: const ScrollPhysics(),
               steps: getSteps(),
               currentStep: currentStep,
-              onStepTapped: (step) => setState(() => currentStep = step),
+              onStepTapped: (step) {
+                setState(() => currentStep = step);
+              },
               onStepContinue: () {
                 final isLastStep = currentStep == getSteps().length - 1;
-                // if (isLastStep) {
-                //   if (_genInfoFormKey.currentState!.validate()) {
-                //     setState(() => isCompleted = true);
-                //     mapDataObj();
-                //   } else {
-                //     setState(() => currentStep = 0);
-                //   }
-                // } else if (currentStep == 0 &&
-                //     !_genInfoFormKey.currentState!.validate()) {
-                //   return;
-                // } else {
-                //   setState(() => currentStep += 1);
-                // }
+                if (isLastStep) {
+                  if (_masterChiefAcknowledgementFormKey.currentState!
+                      .validate()) {
+                    setState(() => isCompleted = true);
+                    //TODO: make data object
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BDNProcessScreen(),
+                      ),
+                    );
+                  } else if (!_deliveryNoteFormKey.currentState!.validate()) {
+                    setState(() => currentStep = 0);
+                  } else if (!_fuelCharacteristicsFormKey.currentState!
+                      .validate()) {
+                    setState(() => currentStep = 1);
+                  } else if (!_quantityFormKey.currentState!.validate()) {
+                    setState(() => currentStep = 2);
+                  } else if (!_supplierConfirmationFormKey.currentState!
+                      .validate()) {
+                    setState(() => currentStep = 3);
+                  }
+                } else if (currentStep == 0 &&
+                    !_deliveryNoteFormKey.currentState!.validate()) {
+                  return;
+                } else if (currentStep == 1 &&
+                    !_fuelCharacteristicsFormKey.currentState!.validate()) {
+                  return;
+                } else if (currentStep == 2 &&
+                    !_quantityFormKey.currentState!.validate()) {
+                  return;
+                } else if (currentStep == 3 &&
+                    !_supplierConfirmationFormKey.currentState!.validate()) {
+                  return;
+                } else {
+                  setState(() => currentStep += 1);
+                }
               },
               onStepCancel: currentStep == 0
                   ? null
@@ -367,7 +397,8 @@ class _BDNScreenState extends State<BDNScreen> {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
-                      Text(widget.job['assignedFromDateTime']),
+                      Text(
+                          '${DateFormat('yyyy-MM-dd HH:mm').format(DateFormat('yyyy-MM-dd').parse(widget.job['assignedFromDateTime']))} HRS'),
                     ],
                   ),
                 ),
@@ -459,13 +490,13 @@ class _BDNScreenState extends State<BDNScreen> {
                 children: [
                   TextFormField(
                     decoration: customInputDecoration('Terminal'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _terminalController,
                     onTapOutside: (PointerDownEvent val) {
                       FocusScope.of(context).requestFocus(FocusNode());
@@ -477,13 +508,13 @@ class _BDNScreenState extends State<BDNScreen> {
             TextFormField(
               readOnly: true,
               decoration: customInputDecoration('BDN Number'),
-              validator: (val) {
-                if (val!.trim().isEmpty) {
-                  return 'Required!';
-                } else {
-                  return null;
-                }
-              },
+              // validator: (val) {
+              //   if (val!.trim().isEmpty) {
+              //     return 'Required!';
+              //   } else {
+              //     return null;
+              //   }
+              // },
               controller: _bdnController,
               onTap: () {
                 FocusScope.of(context).requestFocus(FocusNode());
@@ -1243,13 +1274,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _vesselSN1Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1260,13 +1291,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Counter Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _vesselCSN1Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1282,13 +1313,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _vesselSN2Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1299,13 +1330,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Counter Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _vesselCSN2Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1328,13 +1359,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _bunkerTankerSN1Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1345,13 +1376,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Counter Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _bunkerTankerCSN1Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1367,13 +1398,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _bunkerTankerSN2Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1384,13 +1415,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Counter Seal No'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         controller: _bunkerTankerCSN2Controller,
                         // onTapOutside: (PointerDownEvent val) {
                         //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1410,13 +1441,13 @@ class _BDNScreenState extends State<BDNScreen> {
                 Expanded(
                   child: TextFormField(
                     decoration: customInputDecoration('Seal No'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _surveyorSNController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1427,13 +1458,13 @@ class _BDNScreenState extends State<BDNScreen> {
                 Expanded(
                   child: TextFormField(
                     decoration: customInputDecoration('Counter Seal No'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _surveyorCSNController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1451,13 +1482,13 @@ class _BDNScreenState extends State<BDNScreen> {
                 Expanded(
                   child: TextFormField(
                     decoration: customInputDecoration('Seal No'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _otherSNController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1468,13 +1499,13 @@ class _BDNScreenState extends State<BDNScreen> {
                 Expanded(
                   child: TextFormField(
                     decoration: customInputDecoration('Counter Seal No'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _otherCSNController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1491,13 +1522,13 @@ class _BDNScreenState extends State<BDNScreen> {
                     maxLines: 3,
                     minLines: minLines(),
                     decoration: customInputDecoration('Remark'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _remarkController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());

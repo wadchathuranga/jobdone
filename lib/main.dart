@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
       title: 'Job Done',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+        useMaterial3: false,
+        //primaryColor: Colors.green,
       ),
       // home: const HomePage(title: 'Job Done'),
       home: const CalenderScreen(),

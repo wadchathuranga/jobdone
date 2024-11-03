@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../Databases/bargeAllocation_queries.dart';
-import '../BDN/BDNScreen.dart';
+import '../BDN/BDNIssueScreen.dart';
 import '../BDN/DeliveryNoteScreen/DeliveryNoteScreen.dart';
 
 class JobScreen extends StatefulWidget {
@@ -39,9 +39,12 @@ class _JobScreenState extends State<JobScreen> {
       ),
       body: Column(
         children: [
-          Text(
-            DateFormat('yyyy-MM-dd').format(widget.selectedDate).toString(),
-            style: const TextStyle(fontSize: 20),
+          Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text(
+              DateFormat('yyyy-MM-dd').format(widget.selectedDate).toString(),
+              style: const TextStyle(fontSize: 20),
+            ),
           ),
           ListView.builder(
             shrinkWrap: true,
@@ -116,7 +119,7 @@ class _JobScreenState extends State<JobScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            BDNScreen(job: job),
+                                            BDNIssueScreen(job: job),
                                       ),
                                     );
                                   },
@@ -154,9 +157,7 @@ class _JobScreenState extends State<JobScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                                const SizedBox(width: 10),
                                 const Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -166,9 +167,7 @@ class _JobScreenState extends State<JobScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                                const SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -180,26 +179,26 @@ class _JobScreenState extends State<JobScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            const SizedBox(height: 10),
                             Row(
                               children: [
                                 Text(
                                     'From: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedFromDateTime']).year, DateTime.parse(job['assignedFromDateTime']).month, DateTime.parse(job['assignedFromDateTime']).day, 0, 0, 0)).toString()}   -   To: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedToDateTime']).year, DateTime.parse(job['assignedToDateTime']).month, DateTime.parse(job['assignedToDateTime']).day, 23, 59, 0)).toString()}'),
                               ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            const SizedBox(height: 10),
                             const Row(
                               children: [
                                 Text(
-                                  'Product Details',
+                                  'Show Product Details',
                                   style: TextStyle(
                                     color: Colors.blueAccent,
                                   ),
                                 ),
+                                Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.blueAccent,
+                                )
                               ],
                             ),
                           ],
@@ -233,9 +232,7 @@ class _JobScreenState extends State<JobScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                                const SizedBox(width: 10),
                                 const Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -245,9 +242,7 @@ class _JobScreenState extends State<JobScreen> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                                const SizedBox(width: 10),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -259,18 +254,29 @@ class _JobScreenState extends State<JobScreen> {
                                 ),
                               ],
                             ),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                            const SizedBox(height: 10),
                             Row(
                               children: [
                                 Text(
                                     'From: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedFromDateTime']).year, DateTime.parse(job['assignedFromDateTime']).month, DateTime.parse(job['assignedFromDateTime']).day, 0, 0, 0)).toString()}   -   To: ${DateFormat('HH:mm').format(DateTime(DateTime.parse(job['assignedToDateTime']).year, DateTime.parse(job['assignedToDateTime']).month, DateTime.parse(job['assignedToDateTime']).day, 23, 59, 0)).toString()}'),
                               ],
                             ),
-                            const SizedBox(
-                              height: 10,
+                            const SizedBox(height: 10),
+                            const Row(
+                              children: [
+                                Text(
+                                  'Hide Product Details',
+                                  style: TextStyle(
+                                    color: Colors.blueAccent,
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.arrow_drop_up,
+                                  color: Colors.blueAccent,
+                                )
+                              ],
                             ),
+                            const SizedBox(height: 5),
                             Table(
                               border: TableBorder.all(),
                               children: [
