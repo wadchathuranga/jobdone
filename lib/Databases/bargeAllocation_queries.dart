@@ -226,6 +226,8 @@ class BargeAllocationDB {
                 'jobNo',
                 'assignedFromDateTime',
                 'assignedToDateTime',
+                'port',
+                'berthedTypeCode',
                 'vesselName',
                 'customerName'
               ],

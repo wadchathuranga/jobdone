@@ -5,7 +5,7 @@ import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 import '../../core/stylesAndFormatting.dart';
 
 class BDNScreen extends StatefulWidget {
-  const BDNScreen({Key? key, required this.job}) : super(key: key);
+  const BDNScreen({super.key, required this.job});
 
   final dynamic job;
 
@@ -17,13 +17,17 @@ class _BDNScreenState extends State<BDNScreen> {
   int currentStep = 0;
   bool isCompleted = false;
 
-  ///===================== Step 01 - Delivery Note =====================///
+  ///===================== Step_01 - Delivery Note =====================///
+  final GlobalKey<FormState> _deliveryNoteFormKey = GlobalKey<FormState>();
+
   late List portOfDeliveryList = [];
   var selectedPortOfDelivery;
 
   late List locationOfSupplyList = [];
   var selectedLocationOfSupply;
 
+  final TextEditingController _terminalController = TextEditingController();
+  final TextEditingController _bdnController = TextEditingController();
   final TextEditingController _dateOfAlongSideController =
       TextEditingController();
   final TextEditingController _timeOfAlongSideController =
@@ -39,7 +43,10 @@ class _BDNScreenState extends State<BDNScreen> {
 
   late DateTime date;
 
-  ///===================== Step 02 - Fuel Characteristics =====================///
+  ///===================== Step_02 - Fuel Characteristics =====================///
+  final GlobalKey<FormState> _fuelCharacteristicsFormKey =
+      GlobalKey<FormState>();
+
   late List productList = [];
   var selectedProduct;
 
@@ -50,7 +57,9 @@ class _BDNScreenState extends State<BDNScreen> {
   final TextEditingController _densityController = TextEditingController();
   final TextEditingController _flashPointController = TextEditingController();
 
-  ///===================== Step 03 - Quantity =====================///
+  ///===================== Step_03 - Quantity =====================///
+  final GlobalKey<FormState> _quantityFormKey = GlobalKey<FormState>();
+
   final TextEditingController _grossObservedVolumeController =
       TextEditingController();
   final TextEditingController _grossStandardVolumeController =
@@ -59,17 +68,55 @@ class _BDNScreenState extends State<BDNScreen> {
   final TextEditingController _barrelsAt60FController = TextEditingController();
   final TextEditingController _temperatureController = TextEditingController();
 
-  // final List portOfDeliveryList = [
-  //   "LKCMB | Colombo",
-  //   "DUTRR | Trincomalle",
-  //   "LKGAL | Galle"
-  // ];
+  ///===================== Step_04 - Supplier Confirmation =====================///
+  final GlobalKey<FormState> _supplierConfirmationFormKey =
+      GlobalKey<FormState>();
+
+  final TextEditingController _vesselGrossTonnageController =
+      TextEditingController();
+  final TextEditingController _vesselOwnerOperatorController =
+      TextEditingController();
+  final TextEditingController _dateOfVesselETDController =
+      TextEditingController();
+  final TextEditingController _timeOfVesselETDController =
+      TextEditingController();
+  final TextEditingController _vesselNextPortController =
+      TextEditingController();
+  final TextEditingController _companyNameController = TextEditingController();
+  final TextEditingController _fullNameController = TextEditingController();
+
+  ///===================== Step_05 - Master Chief's Acknowledgement =====================///
+  final GlobalKey<FormState> _masterChiefAcknowledgementFormKey =
+      GlobalKey<FormState>();
+
+  final TextEditingController _vesselSN1Controller = TextEditingController();
+  final TextEditingController _vesselCSN1Controller = TextEditingController();
+  final TextEditingController _vesselSN2Controller = TextEditingController();
+  final TextEditingController _vesselCSN2Controller = TextEditingController();
+  final TextEditingController _bunkerTankerSN1Controller =
+      TextEditingController();
+  final TextEditingController _bunkerTankerCSN1Controller =
+      TextEditingController();
+  final TextEditingController _bunkerTankerSN2Controller =
+      TextEditingController();
+  final TextEditingController _bunkerTankerCSN2Controller =
+      TextEditingController();
+  final TextEditingController _surveyorSNController = TextEditingController();
+  final TextEditingController _surveyorCSNController = TextEditingController();
+  final TextEditingController _otherSNController = TextEditingController();
+  final TextEditingController _otherCSNController = TextEditingController();
+  final TextEditingController _remarkController = TextEditingController();
+
+  ///==========================================================================///
 
   @override
   void initState() {
     super.initState();
 
-    ///=== Step 01 - Delivery Note ===///
+    ///=== Step_01 - Delivery Note ===///
+    selectedPortOfDelivery = widget.job['port'];
+    selectedLocationOfSupply = widget.job['berthedTypeCode'];
+
     date = DateTime.now();
 
     _dateOfAlongSideController.text = DateFormat('yyyy-MM-dd').format(date);
@@ -86,10 +133,14 @@ class _BDNScreenState extends State<BDNScreen> {
     getLocationList();
     getBerthedTypeList();
 
-    ///=== Step 02 - Fuel Characteristics ===///
+    ///=== Step_02 - Fuel Characteristics ===///
     productList = widget.job['jobItems'];
 
-    ///=== Step 03 - Quantity ===///
+    ///=== Step_03 - Quantity ===///
+
+    ///=== Step_04 - Supplier Confirmation ===///
+
+    ///=== Step_05 - Master Chief's Acknowledgement ===///
   }
 
   void getLocationList() async {
@@ -102,53 +153,85 @@ class _BDNScreenState extends State<BDNScreen> {
     setState(() {});
   }
 
-  // void getProductList() async {
-  //   locationOfSupplyList = await LocationAndBerthedTypeDB.getAllBerthedType();
-  //   setState(() {});
-  // }
-
   List<Step> getSteps() => [
-        ///===================== Step 01 - Delivery Note =====================///
+        ///===================== Step_01 - Delivery Note =====================///
         Step(
           isActive: currentStep >= 0,
-          title: const Text('Delivery Note'),
+          // title: const Text('Delivery Note'),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Delivery Note'),
+              currentStep == 0
+                  ? TextButton(onPressed: () {}, child: const Text('clear'))
+                  : const SizedBox()
+            ],
+          ),
           content: deliveryNote(),
         ),
 
-        ///===================== Step 02 - Fuel Characteristics =====================///
+        ///===================== Step_02 - Fuel Characteristics =====================///
         Step(
           isActive: currentStep >= 1,
-          title: const Text('Fuel Characteristics'),
+          // title: const Text('Fuel Characteristics'),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Fuel Characteristics'),
+              currentStep == 1
+                  ? TextButton(onPressed: () {}, child: const Text('clear'))
+                  : const SizedBox()
+            ],
+          ),
           content: fuelCharacteristics(),
         ),
 
-        ///===================== Step 03 - Quantity =====================///
+        ///===================== Step_03 - Quantity =====================///
         Step(
           isActive: currentStep >= 2,
-          title: const Text('Quantity'),
+          // title: const Text('Quantity'),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Quantity'),
+              currentStep == 2
+                  ? TextButton(onPressed: () {}, child: const Text('clear'))
+                  : const SizedBox()
+            ],
+          ),
           content: quantity(),
         ),
 
-        // ///===================== Details of Valuation Info =====================///
-        // Step(
-        //   isActive: currentStep >= 3,
-        //   title: const Text('Details of Valuation'),
-        //   content: valuationInfo(),
-        // ),
-        //
-        // ///===================== Other Details Info =====================///
-        // Step(
-        //   isActive: currentStep >= 4,
-        //   title: const Text('Other Details'),
-        //   content: otherInfo(),
-        // ),
-        //
-        // ///===================== Final Step to Complete =====================///
-        // Step(
-        //   isActive: currentStep >= 5,
-        //   title: const Text('Final Step'),
-        //   content: const SizedBox(),
-        // ),
+        ///===================== Step_04 - Supplier Confirmation =====================///
+        Step(
+          isActive: currentStep >= 3,
+          // title: const Text('Supplier Confirmation'),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Supplier Confirmation'),
+              currentStep == 3
+                  ? TextButton(onPressed: () {}, child: const Text('clear'))
+                  : const SizedBox()
+            ],
+          ),
+          content: supplierConfirmation(),
+        ),
+
+        ///===================== Step_05 - Master Chief's Acknowledgement =====================///
+        Step(
+          isActive: currentStep >= 4,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Master Chief\'s Acknowledgement'),
+              currentStep == 4
+                  ? TextButton(onPressed: () {}, child: const Text('clear'))
+                  : const SizedBox()
+            ],
+          ),
+          content: masterChiefAcknowledgement(),
+        ),
       ];
 
   @override
@@ -234,7 +317,7 @@ class _BDNScreenState extends State<BDNScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 5),
       child: Form(
-        // key: _deliveryNoteFormKey,
+        key: _deliveryNoteFormKey,
         child: Column(
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
@@ -290,9 +373,7 @@ class _BDNScreenState extends State<BDNScreen> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
@@ -316,7 +397,8 @@ class _BDNScreenState extends State<BDNScreen> {
                     items: portOfDeliveryList.map((port) {
                       return DropdownMenuItem(
                         value: port['varLocationCode'].toString(),
-                        child: Text(port['varLocationName'].toString()),
+                        child: Text(
+                            '${port['varLocationCode']} | ${port['varLocationName']}'),
                       );
                     }).toList(),
                     onChanged: (newValueSelected) {
@@ -331,9 +413,7 @@ class _BDNScreenState extends State<BDNScreen> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Row(
               children: [
                 Expanded(
@@ -357,8 +437,8 @@ class _BDNScreenState extends State<BDNScreen> {
                     items: locationOfSupplyList.map((berthedType) {
                       return DropdownMenuItem(
                         value: berthedType['varBerthedTypeCode'].toString(),
-                        child:
-                            Text(berthedType['varBerthedTypeName'].toString()),
+                        child: Text(
+                            '${berthedType['varBerthedTypeCode']} | ${berthedType['varBerthedTypeName']}'),
                       );
                     }).toList(),
                     onChanged: (newValueSelected) {
@@ -378,9 +458,6 @@ class _BDNScreenState extends State<BDNScreen> {
               Column(
                 children: [
                   TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
-                    // controller: _terminalController,
                     decoration: customInputDecoration('Terminal'),
                     validator: (val) {
                       if (val!.trim().isEmpty) {
@@ -389,19 +466,16 @@ class _BDNScreenState extends State<BDNScreen> {
                         return null;
                       }
                     },
+                    controller: _terminalController,
                     onTapOutside: (PointerDownEvent val) {
                       FocusScope.of(context).requestFocus(FocusNode());
                     },
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
+                  const SizedBox(height: 10),
                 ],
               ),
             TextFormField(
               readOnly: true,
-              maxLines: maxLines(),
-              minLines: minLines(),
               decoration: customInputDecoration('BDN Number'),
               validator: (val) {
                 if (val!.trim().isEmpty) {
@@ -410,28 +484,25 @@ class _BDNScreenState extends State<BDNScreen> {
                   return null;
                 }
               },
-              // controller: _bdnController,
+              controller: _bdnController,
+              onTap: () {
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
               onTapOutside: (PointerDownEvent val) {
                 FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Along Side'),
-                const SizedBox(
-                  height: 5,
-                ),
+                const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Expanded(
                       child: TextFormField(
-                        maxLines: maxLines(),
-                        minLines: minLines(),
                         decoration: customInputDecoration('Date'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -448,6 +519,8 @@ class _BDNScreenState extends State<BDNScreen> {
                             _dateOfAlongSideController.text =
                                 DateFormat('yyyy-MM-dd').format(selectedDate);
                           });
+                          if (!mounted)
+                            return; // Checks `this.mounted`, not `context.mounted`.
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
@@ -455,14 +528,10 @@ class _BDNScreenState extends State<BDNScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
-                        maxLines: maxLines(),
-                        minLines: minLines(),
-                        decoration: customInputDecoration('Time'),
+                        decoration: customInputDecoration('Time (HRS)'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
                             return 'Required!';
@@ -478,6 +547,7 @@ class _BDNScreenState extends State<BDNScreen> {
                             _timeOfAlongSideController.text =
                                 DateFormat('HH:mm').format(selectedDate);
                           });
+                          if (!mounted) return;
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
@@ -487,20 +557,14 @@ class _BDNScreenState extends State<BDNScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 const Text('Commenced Pumping'),
-                const SizedBox(
-                  height: 5,
-                ),
+                const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Expanded(
                       child: TextFormField(
-                        maxLines: maxLines(),
-                        minLines: minLines(),
                         decoration: customInputDecoration('Date'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -517,6 +581,7 @@ class _BDNScreenState extends State<BDNScreen> {
                             _dateOfCommencedPumpingController.text =
                                 DateFormat('yyyy-MM-dd').format(selectedDate);
                           });
+                          if (!mounted) return;
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
@@ -524,14 +589,10 @@ class _BDNScreenState extends State<BDNScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
-                        maxLines: maxLines(),
-                        minLines: minLines(),
-                        decoration: customInputDecoration('Time'),
+                        decoration: customInputDecoration('Time (HRS)'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
                             return 'Required!';
@@ -547,6 +608,7 @@ class _BDNScreenState extends State<BDNScreen> {
                             _timeOfCommencedPumpingController.text =
                                 DateFormat('HH:mm').format(selectedDate);
                           });
+                          if (!mounted) return;
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
@@ -556,20 +618,14 @@ class _BDNScreenState extends State<BDNScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
+                const SizedBox(height: 10),
                 const Text('Complete Pumping'),
-                const SizedBox(
-                  height: 5,
-                ),
+                const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Expanded(
                       child: TextFormField(
-                        maxLines: maxLines(),
-                        minLines: minLines(),
                         decoration: customInputDecoration('Date'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
@@ -586,6 +642,7 @@ class _BDNScreenState extends State<BDNScreen> {
                             _dateOfCompletePumpingController.text =
                                 DateFormat('yyyy-MM-dd').format(selectedDate);
                           });
+                          if (!mounted) return;
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
@@ -593,14 +650,10 @@ class _BDNScreenState extends State<BDNScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
-                    ),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: TextFormField(
-                        maxLines: maxLines(),
-                        minLines: minLines(),
-                        decoration: customInputDecoration('Time'),
+                        decoration: customInputDecoration('Time (HRS)'),
                         validator: (val) {
                           if (val!.trim().isEmpty) {
                             return 'Required!';
@@ -616,6 +669,7 @@ class _BDNScreenState extends State<BDNScreen> {
                             _timeOfCompletePumpingController.text =
                                 DateFormat('HH:mm').format(selectedDate);
                           });
+                          if (!mounted) return;
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {
@@ -627,7 +681,7 @@ class _BDNScreenState extends State<BDNScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
           ],
         ),
       ),
@@ -638,7 +692,7 @@ class _BDNScreenState extends State<BDNScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 5),
       child: Form(
-        // key: _fuelCharacteristicsFormKey,
+        key: _fuelCharacteristicsFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -686,8 +740,6 @@ class _BDNScreenState extends State<BDNScreen> {
               children: [
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Viscosity'),
                     validator: (val) {
@@ -703,13 +755,9 @@ class _BDNScreenState extends State<BDNScreen> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Water Content'),
                     validator: (val) {
@@ -720,9 +768,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       }
                     },
                     controller: _waterContentController,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
                     onTapOutside: (PointerDownEvent val) {
                       FocusScope.of(context).requestFocus(FocusNode());
                     },
@@ -730,16 +775,12 @@ class _BDNScreenState extends State<BDNScreen> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Sulphur Content'),
                     validator: (val) {
@@ -755,13 +796,9 @@ class _BDNScreenState extends State<BDNScreen> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Density'),
                     validator: (val) {
@@ -779,17 +816,12 @@ class _BDNScreenState extends State<BDNScreen> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Flexible(
-                  flex: 1,
+                Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Flash Point'),
                     validator: (val) {
@@ -805,18 +837,14 @@ class _BDNScreenState extends State<BDNScreen> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
-                const Flexible(
+                const SizedBox(width: 10),
+                const Expanded(
                   flex: 1,
                   child: SizedBox(),
                 ),
               ],
             ),
-            const SizedBox(
-              height: 5,
-            ),
+            const SizedBox(height: 5),
           ],
         ),
       ),
@@ -827,7 +855,7 @@ class _BDNScreenState extends State<BDNScreen> {
     return Container(
       margin: const EdgeInsets.only(top: 5),
       child: Form(
-        // key: _quantityFormKey,
+        key: _quantityFormKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -836,8 +864,6 @@ class _BDNScreenState extends State<BDNScreen> {
               children: [
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Gross Observed Volume'),
                     validator: (val) {
@@ -853,13 +879,9 @@ class _BDNScreenState extends State<BDNScreen> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Gross Standard Volume'),
                     validator: (val) {
@@ -870,9 +892,6 @@ class _BDNScreenState extends State<BDNScreen> {
                       }
                     },
                     controller: _grossStandardVolumeController,
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
                     onTapOutside: (PointerDownEvent val) {
                       FocusScope.of(context).requestFocus(FocusNode());
                     },
@@ -880,16 +899,12 @@ class _BDNScreenState extends State<BDNScreen> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Quantity (Metric Tons)'),
                     validator: (val) {
@@ -905,13 +920,9 @@ class _BDNScreenState extends State<BDNScreen> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Barrels at 60F'),
                     validator: (val) {
@@ -929,17 +940,13 @@ class _BDNScreenState extends State<BDNScreen> {
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Flexible(
                   flex: 1,
                   child: TextFormField(
-                    maxLines: maxLines(),
-                    minLines: minLines(),
                     keyboardType: TextInputType.number,
                     decoration:
                         customInputDecoration('Temperature VCF and WCF'),
@@ -956,18 +963,550 @@ class _BDNScreenState extends State<BDNScreen> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  width: 10,
-                ),
+                const SizedBox(width: 10),
                 const Flexible(
                   flex: 1,
                   child: SizedBox(),
                 ),
               ],
             ),
-            const SizedBox(
-              height: 5,
+            const SizedBox(height: 5),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget supplierConfirmation() {
+    return Container(
+      margin: const EdgeInsets.only(top: 5),
+      child: Form(
+        key: _supplierConfirmationFormKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: [
+                Column(
+                  children: [
+                    Text('Radio Button 1'),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text('Radio Button 2'),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text('Radio Button 3'),
+                  ],
+                ),
+              ],
             ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration: customInputDecoration('Vessel Gross Tonnage'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _vesselGrossTonnageController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    decoration: customInputDecoration('Vessel Owner/Operator'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _vesselOwnerOperatorController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Vessel ETD'),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Date'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        readOnly: true,
+                        controller: _dateOfVesselETDController,
+                        onTap: () async {
+                          // set date to standard DateTime format
+                          DateTime currDate = DateFormat('yyyy-MM-dd')
+                              .parse(_dateOfVesselETDController.text);
+
+                          // date picker popup
+                          DateTime? newDate = await showDatePicker(
+                            context: context,
+                            initialDate: _dateOfVesselETDController.text.isEmpty
+                                ? date
+                                : currDate,
+                            firstDate: DateTime(DateTime.now().year - 5),
+                            lastDate: DateTime(DateTime.now().year + 5),
+                          );
+
+                          if (newDate != null) {
+                            setState(() {
+                              _dateOfVesselETDController.text =
+                                  DateFormat('yyyy-MM-dd').format(newDate);
+                            });
+                          }
+                          if (!mounted) return;
+                          FocusScope.of(context).requestFocus(FocusNode());
+                        },
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Time (HRS)'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        readOnly: true,
+                        controller: _timeOfVesselETDController,
+                        onTap: () async {
+                          // set time to standard DateTime format
+                          DateTime currDTime = DateFormat('HH:mm')
+                              .parse(_timeOfVesselETDController.text);
+
+                          // time picker popup
+                          TimeOfDay? newTime = await showTimePicker(
+                            context: context,
+                            initialTime: _timeOfVesselETDController.text.isEmpty
+                                ? TimeOfDay.now()
+                                : TimeOfDay(
+                                    hour: currDTime.hour,
+                                    minute: currDTime.minute),
+                          );
+
+                          if (newTime != null) {
+                            DateTime selectedDate = DateTime(0000, 00, 00,
+                                newTime.hour, newTime.minute, 0, 0, 0);
+                            setState(() {
+                              _timeOfVesselETDController.text =
+                                  DateFormat('HH:mm').format(selectedDate);
+                            });
+                          }
+                          if (!mounted) return;
+                          FocusScope.of(context).requestFocus(FocusNode());
+                        },
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    decoration: customInputDecoration('Vessel Next Port'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _vesselNextPortController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: TextFormField(
+                    decoration: customInputDecoration(
+                        'For (Company\'s Name and Stamp)'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _companyNameController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: TextFormField(
+                    decoration:
+                        customInputDecoration('Full Name in Block Letters'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _fullNameController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget masterChiefAcknowledgement() {
+    return Container(
+      margin: const EdgeInsets.only(top: 5),
+      child: Form(
+        key: _masterChiefAcknowledgementFormKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Vessel'),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _vesselSN1Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Counter Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _vesselCSN1Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _vesselSN2Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Counter Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _vesselCSN2Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Bunker Tanker (MARPOL)'),
+                const SizedBox(height: 5),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _bunkerTankerSN1Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Counter Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _bunkerTankerCSN1Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _bunkerTankerSN2Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        decoration: customInputDecoration('Counter Seal No'),
+                        validator: (val) {
+                          if (val!.trim().isEmpty) {
+                            return 'Required!';
+                          } else {
+                            return null;
+                          }
+                        },
+                        controller: _bunkerTankerCSN2Controller,
+                        // onTapOutside: (PointerDownEvent val) {
+                        //   FocusScope.of(context).requestFocus(FocusNode());
+                        // },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Text('Surveyor'),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    decoration: customInputDecoration('Seal No'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _surveyorSNController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextFormField(
+                    decoration: customInputDecoration('Counter Seal No'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _surveyorCSNController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Text('Others'),
+            const SizedBox(height: 5),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    decoration: customInputDecoration('Seal No'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _otherSNController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextFormField(
+                    decoration: customInputDecoration('Counter Seal No'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _otherCSNController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            Row(
+              children: [
+                Flexible(
+                  child: TextFormField(
+                    maxLines: 3,
+                    minLines: minLines(),
+                    decoration: customInputDecoration('Remark'),
+                    validator: (val) {
+                      if (val!.trim().isEmpty) {
+                        return 'Required!';
+                      } else {
+                        return null;
+                      }
+                    },
+                    controller: _remarkController,
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 5),
           ],
         ),
       ),
@@ -996,11 +1535,9 @@ class _BDNScreenState extends State<BDNScreen> {
       initialTime: TimeOfDay.now(),
     );
     if (newTime == null) {
-      return DateTime(
-          date.year, date.month, date.day, date.hour, date.minute, 0, 0, 0);
+      return DateTime(0000, 00, 00, date.hour, date.minute, 0, 0, 0);
     } else {
-      return DateTime(date.year, date.month, date.day, newTime.hour,
-          newTime.minute, 0, 0, 0);
+      return DateTime(0000, 00, 00, newTime.hour, newTime.minute, 0, 0, 0);
     }
   }
 }

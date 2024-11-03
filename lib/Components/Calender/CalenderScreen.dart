@@ -14,7 +14,7 @@ import '../../services/locationAndBerthedTypeService.dart';
 import '../job_screen/JobScreen.dart';
 
 class CalenderScreen extends StatefulWidget {
-  const CalenderScreen({Key? key}) : super(key: key);
+  const CalenderScreen({super.key});
 
   @override
   State<CalenderScreen> createState() => _CalenderScreenState();
