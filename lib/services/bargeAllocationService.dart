@@ -7,7 +7,7 @@ class JobApiService {
       'https://logixbmsmob.advantis.world/BMSAppUATAPI/api';
 
   static String token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ikt1bWFuYSIsInVzZXJJZCI6IjkiLCJhZ2VuY3lJRCI6IjEiLCJjb21wYW55SUQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMwNTI4NjkzLCJleHAiOjE3MzA2MTUwOTMsImlhdCI6MTczMDUyODY5M30.1rsZp4e-eQiOYfSisvFLtVoO_Alxg_tRYl5kzVlF868';
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ikt1bWFuYSIsInVzZXJJZCI6IjkiLCJhZ2VuY3lJRCI6IjEiLCJjb21wYW55SUQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNzMwNzI2Mzg2LCJleHAiOjE3MzA4MTI3ODYsImlhdCI6MTczMDcyNjM4Nn0.LX7nh0N5U98OYCgArzOgjxaVjEzE7vIrd6sL53sihUs';
 
   static Future<bool> saveJobToDB(reqBody) async {
     try {
@@ -54,6 +54,10 @@ class JobApiService {
 
   static Future getBargeAllocationListFromServer() async {
     try {
+      token = await login(); //temporary set token
+
+      print(token);
+
       Uri url = Uri.parse(
           '$BASE_URL/Home/getBargeAllocationCalenderDataOffline?userID=15');
       final response =
@@ -91,4 +95,31 @@ class JobApiService {
   //     throw Exception(err.toString());
   //   }
   // }
+
+  //Tempori
+  static Future<String> login() async {
+    try {
+      Uri url = Uri.parse('https://logixbmsmob.advantis.world/BMSAppUATAuth/api/Auth/login');
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: json.encode({
+          "userName": "KUMANA",
+          "password": "123456"
+        }),
+      );
+
+        print(response.statusCode);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body)['result']['token'];
+      } else {
+        return "";
+      }
+    } catch (err) {
+      print(err.toString());
+      throw Exception(err.toString());
+    }
+  }
 }

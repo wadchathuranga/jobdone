@@ -1090,13 +1090,13 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Date'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         readOnly: true,
                         controller: _dateOfVesselETDController,
                         onTap: () async {
@@ -1132,13 +1132,13 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     Expanded(
                       child: TextFormField(
                         decoration: customInputDecoration('Time (HRS)'),
-                        validator: (val) {
-                          if (val!.trim().isEmpty) {
-                            return 'Required!';
-                          } else {
-                            return null;
-                          }
-                        },
+                        // validator: (val) {
+                        //   if (val!.trim().isEmpty) {
+                        //     return 'Required!';
+                        //   } else {
+                        //     return null;
+                        //   }
+                        // },
                         readOnly: true,
                         controller: _timeOfVesselETDController,
                         onTap: () async {

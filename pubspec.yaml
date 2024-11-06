@@ -44,6 +44,8 @@ dependencies:
   syncfusion_flutter_calendar: ^26.2.13 # To manage calender events
   sqflite: ^2.3.3+1 # To manage database
   connectivity_plus: ^4.0.2 # To manage INTERNET CONNECTIVITY
+  flutter_slidable: ^3.1.1 # To swipe side to do a action
+  page_transition: ^2.1.0 # To manage page transitions
 
 dev_dependencies:
   flutter_test:
