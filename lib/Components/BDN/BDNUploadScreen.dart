@@ -132,42 +132,57 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                         ],
                       ),
 
-                      child: ListTile(
-                        title: Text('JOB123456'),
-                        subtitle: Text('Issued Date'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (!isConnected)
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: ListTile(
+                          title: Text('BDN987654'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text('JOB123456'),
+                                  Text('  |  '),
+                                  Text('LSFO'),
+                                ],
+                              ),
+                              Text(DateTime.now().toString()),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (!isConnected)
+                                const IconButton(
+                                  icon: Icon(
+                                    Icons.signal_wifi_connected_no_internet_4,
+                                    color: Colors.red,
+                                    size: 35,
+                                  ),
+                                  onPressed: null,
+                                )
+                              else if (BDN[index]['isUpload'] == true)
                               const IconButton(
                                 icon: Icon(
-                                  Icons.signal_wifi_connected_no_internet_4,
-                                  color: Colors.red,
+                                  Icons.cloud_done,
+                                  color: Colors.green,
                                   size: 35,
                                 ),
                                 onPressed: null,
                               )
-                            else if (BDN[index]['isUpload'] == true)
-                            const IconButton(
-                              icon: Icon(
-                                Icons.cloud_done,
-                                color: Colors.green,
-                                size: 35,
+                              else if (BDN[index]['isUpload'] == false)
+                              const IconButton(
+                                icon: Icon(
+                                  Icons.cloud_upload,
+                                  color: Colors.blue,
+                                  size: 35,
+                                ),
+                                onPressed: null,
                               ),
-                              onPressed: null,
-                            )
-                            else if (BDN[index]['isUpload'] == false)
-                            const IconButton(
-                              icon: Icon(
-                                Icons.cloud_upload,
-                                color: Colors.blue,
-                                size: 35,
-                              ),
-                              onPressed: null,
-                            ),
-                          ],
+                            ],
+                          ),
+                          onTap: null,
                         ),
-                        onTap: null,
                       ),
                     ),
                   );

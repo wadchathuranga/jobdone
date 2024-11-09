@@ -6,6 +6,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../Databases/bargeAllocation_queries.dart';
@@ -78,10 +79,18 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     if (details.appointments!.isNotEmpty) {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                JobScreen(selectedDate: cellDate)),
+                        PageTransition(
+                            type: PageTransitionType.bottomToTop,
+                            child: JobScreen(selectedDate: cellDate),
+                            inheritTheme: true,
+                            ctx: context),
                       );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) =>
+                      //           JobScreen(selectedDate: cellDate)),
+                      // );
                     }
                   } else if (details.targetElement ==
                       CalendarElement.appointment) {

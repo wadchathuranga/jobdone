@@ -1,6 +1,7 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../Databases/bargeAllocation_queries.dart';
 import '../BDN/BDNIssueScreen.dart';
@@ -117,11 +118,20 @@ class _JobScreenState extends State<JobScreen> {
                                   onPressed: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            BDNIssueScreen(job: job),
+                                      PageTransition(
+                                          type: PageTransitionType.rightToLeft,
+                                          child: BDNIssueScreen(job: job),
+                                          inheritTheme: true,
+                                          ctx: context,
                                       ),
                                     );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (context) =>
+                                    //         BDNIssueScreen(job: job),
+                                    //   ),
+                                    // );
                                   },
                                 ),
                               ],

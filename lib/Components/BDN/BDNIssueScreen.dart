@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../core/stylesAndFormatting.dart';
 import 'BDNProcessScreen.dart';
@@ -262,10 +263,19 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     //TODO: make data object
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => BDNProcessScreen(),
+                      PageTransition(
+                        type: PageTransitionType.rightToLeft,
+                        child: BDNProcessScreen(),
+                        inheritTheme: true,
+                        ctx: context,
                       ),
                     );
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => BDNProcessScreen(),
+                    //   ),
+                    // );
                   } else if (!_deliveryNoteFormKey.currentState!.validate()) {
                     setState(() => currentStep = 0);
                   } else if (!_fuelCharacteristicsFormKey.currentState!
