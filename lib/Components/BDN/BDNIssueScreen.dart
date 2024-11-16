@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:jobdone/Databases/bargePara_queries.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -29,7 +30,8 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
   var selectedLocationOfSupply;
 
   final TextEditingController _terminalController = TextEditingController();
-  final TextEditingController _bdnController = TextEditingController();
+  final TextEditingController _jobWiseBDNNoController = TextEditingController();
+  final TextEditingController _bargeWiseBDNNoController = TextEditingController();
   final TextEditingController _dateOfAlongSideController =
       TextEditingController();
   final TextEditingController _timeOfAlongSideController =
@@ -135,6 +137,8 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
     getLocationList();
     getBerthedTypeList();
 
+    genBargeWiseBDNNo();
+
     ///=== Step_02 - Fuel Characteristics ===///
     productList = widget.job['jobItems'];
 
@@ -154,6 +158,21 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
     locationOfSupplyList = await LocationAndBerthedTypeDB.getAllBerthedType();
     setState(() {});
   }
+
+  void genBargeWiseBDNNo() async {
+    var bargeWiseBDNNo = await BargeParaDB.getBargeParaFromDB();
+    _bargeWiseBDNNoController.text = '${bargeWiseBDNNo['varBargeCode'].substring(0, 3)}${(bargeWiseBDNNo['numBargeBDNSequence'] + 1).toString().padLeft(5, '0')}';
+    genJobWiseBDNNo();
+  }
+
+  void genJobWiseBDNNo() async {
+    String jobWiseBDNNo = widget.job['jobNo'] +
+        (DateTime.parse(widget.job['assignedFromDateTime']).millisecondsSinceEpoch ~/ 10000 +
+            DateTime.parse(widget.job['assignedToDateTime']).millisecondsSinceEpoch ~/ 10000 +
+            DateTime.now().millisecondsSinceEpoch ~/ 10000).toString();
+    _jobWiseBDNNoController.text = jobWiseBDNNo.toString();
+  }
+
 
   List<Step> getSteps() => [
         ///===================== Step_01 - Delivery Note =====================///
@@ -240,7 +259,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('BDN Issue'),
+        title: const Text('BDN Issue'),
       ),
       body: SingleChildScrollView(
         // physics: const ScrollPhysics(),
@@ -518,6 +537,25 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             TextFormField(
               readOnly: true,
               decoration: customInputDecoration('BDN Number'),
+              validator: (val) {
+                if (val!.trim().isEmpty) {
+                  return 'Required!';
+                } else {
+                  return null;
+                }
+              },
+              controller: _bargeWiseBDNNoController,
+              onTap: () {
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              onTapOutside: (PointerDownEvent val) {
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              readOnly: true,
+              decoration: customInputDecoration('Job Wise BDN Number'),
               // validator: (val) {
               //   if (val!.trim().isEmpty) {
               //     return 'Required!';
@@ -525,7 +563,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
               //     return null;
               //   }
               // },
-              controller: _bdnController,
+              controller: _jobWiseBDNNoController,
               onTap: () {
                 FocusScope.of(context).requestFocus(FocusNode());
               },

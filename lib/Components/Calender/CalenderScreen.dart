@@ -5,7 +5,9 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jobdone/Databases/bargePara_queries.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
+import 'package:jobdone/services/bargeParaService.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -29,6 +31,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
   void initState() {
     super.initState();
 
+    getBargeParaData();
     getBargeAllocationData();
     getPortLocationsData();
     getBerthedTypesData();
@@ -115,6 +118,12 @@ class _CalenderScreenState extends State<CalenderScreen> {
               ),
       ),
     );
+  }
+
+  void getBargeParaData() async {
+    var bargePara = jsonDecode(await BargeParaAPIService.getBargeParaDataFromServer())['result'];
+
+    BargeParaDB.saveBargeParaDataToDB(bargePara[0]);
   }
 
   void getPortLocationsData() async {

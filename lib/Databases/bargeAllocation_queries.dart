@@ -13,7 +13,9 @@ class BargeAllocationDB {
   static const String tblBargeAllocation = 'BargeAllocation_table';
   static const String tblJobItem = 'JobItem_table';
 
-  // SAVE: barge allocation
+
+
+  // SAVE: barge allocation save in DB
   static Future saveBargeAllocationListToDB(jobAllocationList) async {
     try {
       final db = await DatabaseHelper.db();
@@ -170,7 +172,7 @@ class BargeAllocationDB {
     }
   }
 
-  // GET: barge allocation list
+  // GET: barge allocation list from DB
   static Future<List<Map<String, dynamic>>>
       getBargeAllocationListFromDB() async {
     try {

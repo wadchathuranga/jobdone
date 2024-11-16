@@ -119,7 +119,12 @@ class _JobScreenState extends State<JobScreen> {
                                     Navigator.push(
                                       context,
                                       PageTransition(
-                                          type: PageTransitionType.rightToLeft,
+                                          // alignment: Alignment.bottomCenter,
+                                          // curve: Curves.easeInOut,
+                                          // duration: Duration(milliseconds: 600),
+                                          // reverseDuration: Duration(milliseconds: 600),
+                                          type: PageTransitionType.rightToLeftJoined,
+                                          childCurrent: JobScreen(selectedDate: widget.selectedDate),
                                           child: BDNIssueScreen(job: job),
                                           inheritTheme: true,
                                           ctx: context,
