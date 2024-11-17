@@ -1,9 +1,14 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:elegant_notification/elegant_notification.dart';
+import 'package:elegant_notification/resources/arrays.dart';
+import 'package:elegant_notification/resources/stacked_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+
+import '../../core/CustomNotification.dart';
 
 enum Actions { delete, upload, genJSON }
 
@@ -15,17 +20,10 @@ class BDNUploadScreen extends StatefulWidget {
 }
 
 class _BDNUploadScreenState extends State<BDNUploadScreen> {
-
   List<Map<String, dynamic>> BDN = [
-    {
-      "isUpload": false
-    },
-    {
-      "isUpload": false
-    },
-    {
-      "isUpload": true
-    }
+    {"isUpload": false},
+    {"isUpload": false},
+    {"isUpload": true}
   ];
 
   @override
@@ -33,7 +31,8 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
     super.initState();
 
     initConnectivity();
-    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(_updateConnectionStatus);
+    _connectivitySubscription =
+        Connectivity().onConnectivityChanged.listen(_updateConnectionStatus);
     //stateInitiateAndUpdate(); --------------------------------------
   }
 
@@ -116,14 +115,14 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                         motion: const DrawerMotion(),
                         children: [
                           SlidableAction(
-                            onPressed: (_) {},
+                            onPressed: (_) => _uploadBDN(),
                             backgroundColor: const Color(0xFF0392CF),
                             foregroundColor: Colors.white,
                             icon: Icons.cloud_upload,
                             label: 'Upload',
                           ),
                           SlidableAction(
-                            onPressed: (_) {},
+                            onPressed: (_) => _downloadJSON(),
                             backgroundColor: Colors.green,
                             foregroundColor: Colors.white,
                             icon: Icons.save,
@@ -131,7 +130,6 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                           ),
                         ],
                       ),
-
                       child: Padding(
                         padding: const EdgeInsets.all(5.0),
                         child: ListTile(
@@ -162,23 +160,23 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                                   onPressed: null,
                                 )
                               else if (BDN[index]['isUpload'] == true)
-                              const IconButton(
-                                icon: Icon(
-                                  Icons.cloud_done,
-                                  color: Colors.green,
-                                  size: 35,
-                                ),
-                                onPressed: null,
-                              )
+                                const IconButton(
+                                  icon: Icon(
+                                    Icons.cloud_done,
+                                    color: Colors.green,
+                                    size: 35,
+                                  ),
+                                  onPressed: null,
+                                )
                               else if (BDN[index]['isUpload'] == false)
-                              const IconButton(
-                                icon: Icon(
-                                  Icons.cloud_upload,
-                                  color: Colors.blue,
-                                  size: 35,
+                                const IconButton(
+                                  icon: Icon(
+                                    Icons.cloud_upload,
+                                    color: Colors.blue,
+                                    size: 35,
+                                  ),
+                                  onPressed: null,
                                 ),
-                                onPressed: null,
-                              ),
                             ],
                           ),
                           onTap: null,
@@ -195,13 +193,34 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
     );
   }
 
+  void _uploadBDN() {
+    // TODO: create API call to upload BDN to server
+
+    // Show alert
+    CustomNotification.showSuccess(
+      context: context,
+      message: "BDN Uploaded.",
+    );
+  }
+
+  void _downloadJSON() {
+    // TODO: create JSON file and it should download
+
+    // Show alert
+    CustomNotification.showSuccess(
+      context: context,
+      message: "BDN File Downloaded.",
+    );
+  }
+
   _onDismissed(Actions action, data) {
     // setState(() => _semesters.removeAt(index));
     switch (action) {
       case Actions.delete:
         showAlertDialog(
           context,
-          alertMsg:  "Do you want to delete Year all the exam results as well...",
+          alertMsg:
+              "Do you want to delete Year all the exam results as well...",
         );
         break;
       case Actions.upload:

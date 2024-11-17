@@ -45,6 +45,8 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
   final TextEditingController _timeOfCompletePumpingController =
       TextEditingController();
 
+  var jobWiseBDNNo = '';
+
   late DateTime date;
 
   ///===================== Step_02 - Fuel Characteristics =====================///
@@ -166,7 +168,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
   }
 
   void genJobWiseBDNNo() async {
-    String jobWiseBDNNo = widget.job['jobNo'] +
+    jobWiseBDNNo = widget.job['jobNo'] +
         (DateTime.parse(widget.job['assignedFromDateTime']).millisecondsSinceEpoch ~/ 10000 +
             DateTime.parse(widget.job['assignedToDateTime']).millisecondsSinceEpoch ~/ 10000 +
             DateTime.now().millisecondsSinceEpoch ~/ 10000).toString();
@@ -553,25 +555,25 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
               },
             ),
             const SizedBox(height: 10),
-            TextFormField(
-              readOnly: true,
-              decoration: customInputDecoration('Job Wise BDN Number'),
-              // validator: (val) {
-              //   if (val!.trim().isEmpty) {
-              //     return 'Required!';
-              //   } else {
-              //     return null;
-              //   }
-              // },
-              controller: _jobWiseBDNNoController,
-              onTap: () {
-                FocusScope.of(context).requestFocus(FocusNode());
-              },
-              onTapOutside: (PointerDownEvent val) {
-                FocusScope.of(context).requestFocus(FocusNode());
-              },
-            ),
-            const SizedBox(height: 10),
+            // TextFormField(
+            //   readOnly: true,
+            //   decoration: customInputDecoration('Job Wise BDN Number'),
+            //   validator: (val) {
+            //     if (val!.trim().isEmpty) {
+            //       return 'Required!';
+            //     } else {
+            //       return null;
+            //     }
+            //   },
+            //   controller: _jobWiseBDNNoController,
+            //   onTap: () {
+            //     FocusScope.of(context).requestFocus(FocusNode());
+            //   },
+            //   onTapOutside: (PointerDownEvent val) {
+            //     FocusScope.of(context).requestFocus(FocusNode());
+            //   },
+            // ),
+            // const SizedBox(height: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
