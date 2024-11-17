@@ -4,6 +4,7 @@ import 'package:jobdone/Databases/bargePara_queries.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 import 'package:page_transition/page_transition.dart';
 
+import '../../Models/BDNModel.dart';
 import '../../core/stylesAndFormatting.dart';
 import 'BDNProcessScreen.dart';
 
@@ -281,7 +282,38 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                   if (_masterChiefAcknowledgementFormKey.currentState!
                       .validate()) {
                     setState(() => isCompleted = true);
-                    //TODO: make data object
+                    //TODO: data object should complete
+                    final requestBody = BDN(
+                      jobID: widget.job['jobID'],
+                      jobItemID: widget.job['jobItems'],
+                      bdnNo: _jobWiseBDNNoController.text.toString(),
+                      bargeBdnNo: _bargeWiseBDNNoController.text.toString(),
+                      alongSide: null,
+                      pumpingCom: null,
+                      comp: null,
+                      jobProductCode: null,
+                      viscocity: _viscocityController.text.isNotEmpty ? double.parse(_viscocityController.text) : null,
+                      density: double.parse(_densityController.text),
+                      waterContent: null,
+                      flashPoint: null,
+                      sulphurContent: null,
+                      grObVolume: null,
+                      qty: null,
+                      barsixtyF: null,
+                      temp: null,
+                      grosstonnage: null,
+                      owneroparator: null,
+                      nextPort: null,
+                      dteVslETD: null,
+                      locationCode: selectedPortOfDelivery,
+                      berthedTypeCode: selectedLocationOfSupply,
+                      berthedLocation: _terminalController.text.trim().isNotEmpty ? _terminalController.text : '',
+                      companyID: 99,
+                      agencyID: 99,
+                      createdBy: 99,
+                      sampleIssue: null,
+                      supConf: null,
+                    );
                     Navigator.push(
                       context,
                       PageTransition(
@@ -291,12 +323,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         ctx: context,
                       ),
                     );
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => BDNProcessScreen(),
-                    //   ),
-                    // );
+
                   } else if (!_deliveryNoteFormKey.currentState!.validate()) {
                     setState(() => currentStep = 0);
                   } else if (!_fuelCharacteristicsFormKey.currentState!

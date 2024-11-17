@@ -236,7 +236,7 @@ class BargeAllocationDB {
               where: 'assignedFromDateTime=? AND assignedToDateTime=?',
               whereArgs: [selectedDate.toString(), selectedDate.toString()]);
 
-      // get jobItems and bind to the man job
+      // get jobItems and bind to the main job
       if (allocatedJobList.isNotEmpty) {
         for (int i = 0; i < allocatedJobList.length; i++) {
           Map<String, dynamic> newMap =

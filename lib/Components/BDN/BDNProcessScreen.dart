@@ -78,9 +78,9 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
           children: [
             Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text('BDN PROCESS'),
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text('BDN COMPLETION'),
                 ),
                 //TODO: check connectivity status and allow user to proceed with the relevant button
                 if (isConnected)
@@ -128,7 +128,7 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
                               height: 5,
                             ),
                             Text(
-                              'SAVE BDN',
+                              'ISSUE BDN',
                               textAlign: TextAlign.center,
                             ),
                           ],
@@ -137,7 +137,7 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
                     ),
                     onPressed: () {},
                   ),
-                SizedBox(height: 10,),
+                const SizedBox(height: 10,),
                 ElevatedButton(
                   child: SizedBox(
                     height: MediaQuery.of(context).size.width/4,
