@@ -126,7 +126,7 @@ class BDN {
 class SupConf {
   String? regCode;
   bool? value;
-  int? spValue;
+  double? spValue;
 
   SupConf({this.regCode, this.value, this.spValue});
 

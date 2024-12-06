@@ -24,7 +24,6 @@ class MyApp extends StatelessWidget {
       ),
       // home: const HomePage(title: 'Job Done'),
       home: const CalenderScreen(),
-
     );
   }
 }

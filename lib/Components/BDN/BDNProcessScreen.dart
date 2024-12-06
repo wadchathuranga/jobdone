@@ -3,11 +3,15 @@ import 'dart:developer' as developer;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jobdone/Models/BDNModel.dart';
 
 import 'BDNUploadScreen.dart';
+import 'DownloadJSONFile.dart';
 
 class BDNProcessScreen extends StatefulWidget {
-  const BDNProcessScreen({super.key});
+  const BDNProcessScreen({super.key, required this.bdnData});
+
+  final BDN bdnData;
 
   @override
   State<BDNProcessScreen> createState() => _BDNProcessScreenState();
@@ -53,7 +57,6 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
     setState(() {
       isConnected = result != ConnectivityResult.none;
     });
-    print(isConnected);
   }
 
   // --------------------------------------
@@ -73,23 +76,29 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
         title: const Text('BDN Process'),
       ),
       body: SingleChildScrollView(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(
+          //mainAxisAlignment: MainAxisAlignment.center,
+          //mainAxisSize: MainAxisSize.max,
           children: [
-            Column(
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text('BDN COMPLETION'),
                 ),
-                //TODO: check connectivity status and allow user to proceed with the relevant button
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 if (isConnected)
                   ElevatedButton(
                     child: SizedBox(
-                      height: MediaQuery.of(context).size.width/4,
-                      width: MediaQuery.of(context).size.width/4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
+                      height: MediaQuery.of(context).size.width / 4,
+                      width: MediaQuery.of(context).size.width / 4,
+                      child: const Padding(
+                        padding: EdgeInsets.all(15.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -108,66 +117,53 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      //TODO: upload BDN to the server DB
+
+                      final snackBar = SnackBar(
+                        content: const Text('BDN Uploading... Please Wait...'),
+                        action: SnackBarAction(
+                          label: 'Dismiss',
+                          onPressed: () {
+                            // Perform an action
+                          },
+                        ),
+                        duration: const Duration(
+                            seconds: 3), // Duration the snackbar is visible
+                      );
+
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    },
                   )
                 else
                   ElevatedButton(
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.width/4,
-                      width: MediaQuery.of(context).size.width/4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.save,
-                              size: 50,
-                            ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Text(
-                              'ISSUE BDN',
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.width / 4,
+                        width: MediaQuery.of(context).size.width / 4,
+                        child: const Padding(
+                          padding: EdgeInsets.all(15.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.save,
+                                size: 50,
+                              ),
+                              SizedBox(height: 5),
+                              Text(
+                                'ISSUE BDN',
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    onPressed: () {},
-                  ),
-                const SizedBox(height: 10,),
-                ElevatedButton(
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.width/4,
-                    width: MediaQuery.of(context).size.width/4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.download,
-                            size: 50,
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            'DOWNLOAD',
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            'BDN AS A PDF',
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  onPressed: () {},
-                ),
+                      onPressed: () async {
+                        //TODO: save BDN in BDN table of local DB
+
+                        // Download BDN as a JSON File
+                        await downloadJSONFile(context, widget.bdnData);
+                      }),
               ],
             ),
           ],

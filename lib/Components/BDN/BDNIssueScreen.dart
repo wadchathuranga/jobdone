@@ -7,6 +7,7 @@ import 'package:page_transition/page_transition.dart';
 import '../../Models/BDNModel.dart';
 import '../../core/stylesAndFormatting.dart';
 import 'BDNProcessScreen.dart';
+import 'DownloadJSONFile.dart';
 
 class BDNIssueScreen extends StatefulWidget {
   const BDNIssueScreen({super.key, required this.job});
@@ -32,7 +33,8 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
 
   final TextEditingController _terminalController = TextEditingController();
   final TextEditingController _jobWiseBDNNoController = TextEditingController();
-  final TextEditingController _bargeWiseBDNNoController = TextEditingController();
+  final TextEditingController _bargeWiseBDNNoController =
+      TextEditingController();
   final TextEditingController _dateOfAlongSideController =
       TextEditingController();
   final TextEditingController _timeOfAlongSideController =
@@ -79,6 +81,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
   final GlobalKey<FormState> _supplierConfirmationFormKey =
       GlobalKey<FormState>();
 
+  final TextEditingController _pslValueOfController = TextEditingController();
   final TextEditingController _vesselGrossTonnageController =
       TextEditingController();
   final TextEditingController _vesselOwnerOperatorController =
@@ -91,6 +94,10 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
       TextEditingController();
   final TextEditingController _companyNameController = TextEditingController();
   final TextEditingController _fullNameController = TextEditingController();
+
+  bool isChecked1 = false;
+  bool isChecked2 = false;
+  bool isChecked3 = false;
 
   ///===================== Step_05 - Master Chief's Acknowledgement =====================///
   final GlobalKey<FormState> _masterChiefAcknowledgementFormKey =
@@ -148,6 +155,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
     ///=== Step_03 - Quantity ===///
 
     ///=== Step_04 - Supplier Confirmation ===///
+    _pslValueOfController.text = "0";
 
     ///=== Step_05 - Master Chief's Acknowledgement ===///
   }
@@ -164,18 +172,23 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
 
   void genBargeWiseBDNNo() async {
     var bargeWiseBDNNo = await BargeParaDB.getBargeParaFromDB();
-    _bargeWiseBDNNoController.text = '${bargeWiseBDNNo['varBargeCode'].substring(0, 3)}${(bargeWiseBDNNo['numBargeBDNSequence'] + 1).toString().padLeft(5, '0')}';
+    _bargeWiseBDNNoController.text =
+        '${bargeWiseBDNNo['varBargeCode'].substring(0, 3)}${(bargeWiseBDNNo['numBargeBDNSequence'] + 1).toString().padLeft(5, '0')}';
     genJobWiseBDNNo();
   }
 
   void genJobWiseBDNNo() async {
     jobWiseBDNNo = widget.job['jobNo'] +
-        (DateTime.parse(widget.job['assignedFromDateTime']).millisecondsSinceEpoch ~/ 10000 +
-            DateTime.parse(widget.job['assignedToDateTime']).millisecondsSinceEpoch ~/ 10000 +
-            DateTime.now().millisecondsSinceEpoch ~/ 10000).toString();
+        (DateTime.parse(widget.job['assignedFromDateTime'])
+                        .millisecondsSinceEpoch ~/
+                    10000 +
+                DateTime.parse(widget.job['assignedToDateTime'])
+                        .millisecondsSinceEpoch ~/
+                    10000 +
+                DateTime.now().millisecondsSinceEpoch ~/ 10000)
+            .toString();
     _jobWiseBDNNoController.text = jobWiseBDNNo.toString();
   }
-
 
   List<Step> getSteps() => [
         ///===================== Step_01 - Delivery Note =====================///
@@ -274,56 +287,29 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
               steps: getSteps(),
               currentStep: currentStep,
               onStepTapped: (step) {
-                setState(() => currentStep = step);
+                setState(() => currentStep =
+                    step); //TODO: comment this line for avoid step jumping
               },
-              onStepContinue: () {
+              onStepContinue: () async {
                 final isLastStep = currentStep == getSteps().length - 1;
                 if (isLastStep) {
                   if (_masterChiefAcknowledgementFormKey.currentState!
                       .validate()) {
                     setState(() => isCompleted = true);
-                    //TODO: data object should complete
-                    final requestBody = BDN(
-                      jobID: widget.job['jobID'],
-                      jobItemID: widget.job['jobItems'],
-                      bdnNo: _jobWiseBDNNoController.text.toString(),
-                      bargeBdnNo: _bargeWiseBDNNoController.text.toString(),
-                      alongSide: null,
-                      pumpingCom: null,
-                      comp: null,
-                      jobProductCode: null,
-                      viscocity: _viscocityController.text.isNotEmpty ? double.parse(_viscocityController.text) : null,
-                      density: double.parse(_densityController.text),
-                      waterContent: null,
-                      flashPoint: null,
-                      sulphurContent: null,
-                      grObVolume: null,
-                      qty: null,
-                      barsixtyF: null,
-                      temp: null,
-                      grosstonnage: null,
-                      owneroparator: null,
-                      nextPort: null,
-                      dteVslETD: null,
-                      locationCode: selectedPortOfDelivery,
-                      berthedTypeCode: selectedLocationOfSupply,
-                      berthedLocation: _terminalController.text.trim().isNotEmpty ? _terminalController.text : '',
-                      companyID: 99,
-                      agencyID: 99,
-                      createdBy: 99,
-                      sampleIssue: null,
-                      supConf: null,
-                    );
+
+                    //TODO: data object should completely check
+                    final requestBody = makeObjBDN();
+
+                    if (!context.mounted) return;
                     Navigator.push(
                       context,
                       PageTransition(
                         type: PageTransitionType.rightToLeft,
-                        child: BDNProcessScreen(),
+                        child: BDNProcessScreen(bdnData: requestBody),
                         inheritTheme: true,
                         ctx: context,
                       ),
                     );
-
                   } else if (!_deliveryNoteFormKey.currentState!.validate()) {
                     setState(() => currentStep = 0);
                   } else if (!_fuelCharacteristicsFormKey.currentState!
@@ -399,6 +385,166 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
         ),
       ),
     );
+  }
+
+
+
+  BDN makeObjBDN() {
+    return BDN(
+      /// Delivery Note
+      jobID: widget.job['jobID'],
+      jobItemID: int.parse(selectedProduct),
+      bdnNo: _jobWiseBDNNoController.text.toString(),
+      bargeBdnNo: _bargeWiseBDNNoController.text.toString(),
+      dteVslETD: null,
+      locationCode: selectedPortOfDelivery,
+      berthedTypeCode: selectedLocationOfSupply,
+      berthedLocation: _terminalController.text.trim().isNotEmpty
+          ? _terminalController.text
+          : '',
+      alongSide: null,
+      pumpingCom: null,
+      comp: null,
+      jobProductCode: productList
+          .firstWhere(
+            (product) => product['jobItemDtID'] == int.parse(selectedProduct),
+          )
+          ['productCode'],
+
+      /// Fuel Characteristic
+      viscocity: _viscocityController.text.isNotEmpty
+          ? double.parse(_viscocityController.text.trim())
+          : null,
+      density: _densityController.text.isNotEmpty
+          ? double.parse(_densityController.text.trim())
+          : null,
+      waterContent: _waterContentController.text.isNotEmpty
+          ? double.parse(_waterContentController.text.trim())
+          : null,
+      flashPoint: _flashPointController.text.isNotEmpty
+          ? double.parse(_flashPointController.text.trim())
+          : null,
+      sulphurContent: _sulphurContentController.text.isNotEmpty
+          ? double.parse(_sulphurContentController.text.trim())
+          : null,
+
+      /// Quantity
+      grObVolume: _grossObservedVolumeController.text.isNotEmpty
+          ? double.parse(_grossObservedVolumeController.text.trim())
+          : null,
+      grStVolumne: _grossStandardVolumeController.text.isNotEmpty
+          ? double.parse(_grossStandardVolumeController.text.trim())
+          : null,
+      qty: _quantityMTController.text.isNotEmpty
+          ? double.parse(_quantityMTController.text.trim())
+          : null,
+      barsixtyF: _barrelsAt60FController.text.isNotEmpty
+          ? double.parse(_barrelsAt60FController.text.trim())
+          : null,
+      temp: _temperatureController.text.isNotEmpty
+          ? double.parse(_temperatureController.text.trim())
+          : null,
+
+      /// Supplier Confirmation
+      supConf: supplierConfirmationList(),
+      grosstonnage: _vesselGrossTonnageController.text.isNotEmpty
+          ? double.parse(_vesselGrossTonnageController.text.trim())
+          : null,
+      owneroparator: _vesselOwnerOperatorController.text,
+      //TODO: check this vesselETD necessary or not
+      nextPort: _vesselNextPortController.text,
+      nameStamp: _companyNameController.text,
+      fullName: _fullNameController.text,
+
+      /// Master Chief's Acknowledgement
+      sampleIssue: sampleIssueList(),
+
+      /// Others
+      companyID: 99,
+      agencyID: 99,
+      createdBy: 99,
+    );
+  }
+
+  List<SupConf> supplierConfirmationList() {
+    return [
+      SupConf(
+        regCode: 'REG01',
+        value: isChecked1,
+        spValue: -1,
+      ),
+      SupConf(
+        regCode: 'REG02',
+        value: isChecked2,
+        spValue: -1,
+      ),
+      SupConf(
+        regCode: 'REG03',
+        value: isChecked3,
+        spValue: _pslValueOfController.text.isNotEmpty
+            ? double.parse(_pslValueOfController.text.trim())
+            : 0,
+      )
+    ];
+  }
+
+  List<SampleIssue> sampleIssueList() {
+    return [
+      SampleIssue(
+        sealNo: _vesselSN1Controller.text.trim().isNotEmpty
+            ? _vesselSN1Controller.text
+            : "",
+        conSealNo: _vesselCSN1Controller.text.trim().isNotEmpty
+            ? _vesselCSN1Controller.text
+            : "",
+        issueParty: "VESSL",
+      ),
+      SampleIssue(
+        sealNo: _vesselSN2Controller.text.trim().isNotEmpty
+            ? _vesselSN1Controller.text
+            : "",
+        conSealNo: _vesselCSN1Controller.text.trim().isNotEmpty
+            ? _vesselCSN2Controller.text
+            : "",
+        issueParty: "VESSL",
+      ),
+      SampleIssue(
+        sealNo: _bunkerTankerSN1Controller.text.trim().isNotEmpty
+            ? _bunkerTankerSN1Controller.text
+            : "",
+        conSealNo: _bunkerTankerCSN1Controller.text.trim().isNotEmpty
+            ? _bunkerTankerCSN1Controller.text
+            : "",
+        issueParty: "BNTN",
+      ),
+      SampleIssue(
+        sealNo: _bunkerTankerSN2Controller.text.trim().isNotEmpty
+            ? _bunkerTankerSN1Controller.text
+            : "",
+        conSealNo: _bunkerTankerCSN2Controller.text.trim().isNotEmpty
+            ? _bunkerTankerCSN1Controller.text
+            : "",
+        issueParty: "BNTN",
+      ),
+      SampleIssue(
+        sealNo: _surveyorSNController.text.trim().isNotEmpty
+            ? _surveyorSNController.text
+            : "",
+        conSealNo: _surveyorCSNController.text.trim().isNotEmpty
+            ? _surveyorCSNController.text
+            : "",
+        issueParty: "SURV",
+      ),
+      SampleIssue(
+        sealNo: _otherSNController.text.trim().isNotEmpty
+            ? _otherSNController.text
+            : "",
+        conSealNo: _otherCSNController.text.trim().isNotEmpty
+            ? _otherCSNController.text
+            : "",
+        issueParty: "OTHER",
+      ),
+    ];
   }
 
   Widget deliveryNote() {
@@ -608,6 +754,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -670,6 +817,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -731,6 +879,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -805,6 +954,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: DropdownButtonFormField<String>(
@@ -826,7 +976,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     ),
                     items: productList.map((product) {
                       return DropdownMenuItem(
-                        value: product['productCode'].toString(),
+                        value: product['jobItemDtID'].toString(),
                         child: Text(product['productCode'].toString()),
                       );
                     }).toList(),
@@ -845,6 +995,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -858,9 +1009,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _viscocityController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -876,9 +1024,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _waterContentController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
                   ),
                 ),
               ],
@@ -886,6 +1031,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -899,9 +1045,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _sulphurContentController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -917,9 +1060,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _densityController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
                   ),
                 ),
               ],
@@ -927,6 +1067,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -940,9 +1081,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _flashPointController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -969,6 +1107,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
           children: <Widget>[
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -982,9 +1121,9 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _grossObservedVolumeController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1000,9 +1139,9 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _grossStandardVolumeController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
                   ),
                 ),
               ],
@@ -1010,6 +1149,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -1023,9 +1163,9 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       }
                     },
                     controller: _quantityMTController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1033,17 +1173,17 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Barrels at 60F'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _barrelsAt60FController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
                   ),
                 ),
               ],
@@ -1051,6 +1191,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             const SizedBox(height: 10),
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Flexible(
                   flex: 1,
@@ -1058,17 +1199,17 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     keyboardType: TextInputType.number,
                     decoration:
                         customInputDecoration('Temperature VCF and WCF'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _temperatureController,
-                    onTapOutside: (PointerDownEvent val) {
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    },
+                    // onTapOutside: (PointerDownEvent val) {
+                    //   FocusScope.of(context).requestFocus(FocusNode());
+                    // },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1094,19 +1235,82 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Column(
-                  children: [
-                    Text('Radio Button 1'),
-                    const SizedBox(
-                      height: 10,
+                Checkbox(
+                  value: isChecked1,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked1 = value ?? false;
+                    });
+                  },
+                ),
+                const Expanded(
+                  child: Text(
+                    "3.5% m/m or 0.5% m/m as per the limit value given by the regulation 14.1",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Checkbox(
+                  value: isChecked2,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked2 = value ?? false;
+                    });
+                  },
+                ),
+                const Expanded(
+                  child: Text(
+                    "0.5% m/m as per the limit value given by the regulation 14.1",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Checkbox(
+                  value: isChecked3,
+                  onChanged: (bool? value) {
+                    setState(() {
+                      isChecked3 = value ?? false;
+                    });
+                  },
+                ),
+                const Text(
+                  "purchase specified limit value of ",
+                ),
+                Flexible(
+                  child: TextField(
+                    readOnly: !isChecked3,
+                    keyboardType: TextInputType.number,
+                    controller: _pslValueOfController,
+                    textAlign: TextAlign.center,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 3,
+                        horizontal: 3,
+                      ),
+                      border: OutlineInputBorder(),
                     ),
-                    Text('Radio Button 2'),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Text('Radio Button 3'),
-                  ],
+                  ),
+                ),
+                const Text(
+                  " % m/m",
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               ],
             ),
@@ -1118,13 +1322,13 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                   child: TextFormField(
                     keyboardType: TextInputType.number,
                     decoration: customInputDecoration('Vessel Gross Tonnage'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _vesselGrossTonnageController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1140,13 +1344,13 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 Expanded(
                   child: TextFormField(
                     decoration: customInputDecoration('Vessel Owner/Operator'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _vesselOwnerOperatorController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1163,6 +1367,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -1260,13 +1465,13 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 Expanded(
                   child: TextFormField(
                     decoration: customInputDecoration('Vessel Next Port'),
-                    validator: (val) {
-                      if (val!.trim().isEmpty) {
-                        return 'Required!';
-                      } else {
-                        return null;
-                      }
-                    },
+                    // validator: (val) {
+                    //   if (val!.trim().isEmpty) {
+                    //     return 'Required!';
+                    //   } else {
+                    //     return null;
+                    //   }
+                    // },
                     controller: _vesselNextPortController,
                     // onTapOutside: (PointerDownEvent val) {
                     //   FocusScope.of(context).requestFocus(FocusNode());
@@ -1347,6 +1552,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -1359,9 +1565,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _vesselSN1Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -1376,9 +1579,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _vesselCSN1Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                   ],
@@ -1386,6 +1586,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 10),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -1398,9 +1599,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _vesselSN2Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -1415,9 +1613,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _vesselCSN2Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                   ],
@@ -1432,6 +1627,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 5),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -1444,9 +1640,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _bunkerTankerSN1Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -1461,9 +1654,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _bunkerTankerCSN1Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                   ],
@@ -1471,6 +1661,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                 const SizedBox(height: 10),
                 Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
                       child: TextFormField(
@@ -1483,9 +1674,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _bunkerTankerSN2Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -1500,9 +1688,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                         //   }
                         // },
                         controller: _bunkerTankerCSN2Controller,
-                        // onTapOutside: (PointerDownEvent val) {
-                        //   FocusScope.of(context).requestFocus(FocusNode());
-                        // },
                       ),
                     ),
                   ],
@@ -1514,6 +1699,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             const SizedBox(height: 5),
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -1526,9 +1712,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     //   }
                     // },
                     controller: _surveyorSNController,
-                    // onTapOutside: (PointerDownEvent val) {
-                    //   FocusScope.of(context).requestFocus(FocusNode());
-                    // },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1543,9 +1726,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     //   }
                     // },
                     controller: _surveyorCSNController,
-                    // onTapOutside: (PointerDownEvent val) {
-                    //   FocusScope.of(context).requestFocus(FocusNode());
-                    // },
                   ),
                 ),
               ],
@@ -1555,6 +1735,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
             const SizedBox(height: 5),
             Row(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -1567,9 +1748,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     //   }
                     // },
                     controller: _otherSNController,
-                    // onTapOutside: (PointerDownEvent val) {
-                    //   FocusScope.of(context).requestFocus(FocusNode());
-                    // },
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -1584,9 +1762,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     //   }
                     // },
                     controller: _otherCSNController,
-                    // onTapOutside: (PointerDownEvent val) {
-                    //   FocusScope.of(context).requestFocus(FocusNode());
-                    // },
                   ),
                 ),
               ],
@@ -1607,9 +1782,6 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                     //   }
                     // },
                     controller: _remarkController,
-                    // onTapOutside: (PointerDownEvent val) {
-                    //   FocusScope.of(context).requestFocus(FocusNode());
-                    // },
                   ),
                 ),
               ],

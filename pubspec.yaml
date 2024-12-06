@@ -47,7 +47,9 @@ dependencies:
   flutter_slidable: ^3.1.1 # To swipe side to do a action
   page_transition: ^2.1.0 # To manage page transitions
   elegant_notification: ^2.3.1 # To show alerts, notification, and messages
-  fluttertoast: ^8.2.8 # To manage alert msg
+  path_provider: ^2.1.5 # To manage storage locations / paths
+  permission_handler: ^11.3.1 # To manage storage permissions
+  #fluttertoast: ^8.2.8 # To manage alert msg
 
 dev_dependencies:
   flutter_test:

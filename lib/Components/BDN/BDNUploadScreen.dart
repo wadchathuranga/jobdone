@@ -214,7 +214,6 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
   }
 
   _onDismissed(Actions action, data) {
-    // setState(() => _semesters.removeAt(index));
     switch (action) {
       case Actions.delete:
         showAlertDialog(
