@@ -234,18 +234,20 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                     return result;
                   },
                   onDismissed: () {
-                    //TODO: make this proper way
-                    setState(() {
-                      bdnList.removeWhere((item) =>
-                      item['bdnID'] == element['bdnID']);
-                    });
+                    deleteBdnFromDB(element);
                   },
               ),
               children: [
                 SlidableAction(
-                  autoClose: false,
-                  onPressed: (_) {
-                    //_onDismissedConfirm(element);
+                  autoClose: true,
+                  onPressed: (_) async {
+                    final controller2 = Slidable.of(context);
+                    final result = await _showDeleteConfirmation();
+                    if (!result) {
+                      controller2?.close();
+                      return;// Manually close if cancelled
+                    }
+                    deleteBdnFromDB(element);
                   },
                   backgroundColor: const Color(0xFFFE4A49),
                   foregroundColor: Colors.white,
@@ -389,43 +391,13 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
     ) ?? false;
   }
 
-  _onDismissedConfirm(Actions action, element) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text("Are you sure..?"),
-          content: const Text("Are you sure you want to delete this item?"),
-          actions: [
-            TextButton(
-              child: const Text(
-                "No",
-                style: TextStyle(
-                  color: Colors.deepPurple,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text(
-                "Yes",
-                style: TextStyle(
-                  color: Colors.deepPurple,
-                ),
-              ),
-              onPressed: () async {
-                setState(() {
-                  bdnList.removeWhere((item) =>
-                  item['bdnID'] == element['bdnID']);
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+  deleteBdnFromDB(element) {
+    //TODO: make this proper way on the DB side as well
+
+    setState(() {
+      bdnList.removeWhere((item) =>
+      item['bdnID'] == element['bdnID']);
+    });
   }
+
 }
