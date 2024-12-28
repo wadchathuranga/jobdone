@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../../Models/BDNModel.dart';
-import '../../core/CustomNotification.dart';
+import '../Models/BDNModel.dart';
+import 'CustomNotification.dart';
 
 Future<void> downloadJSONFile(BuildContext context, BDN bdnObj) async {
   try {

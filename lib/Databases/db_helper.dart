@@ -28,6 +28,7 @@ class DatabaseHelper {
         CREATE TABLE $tblBDN(
           bdnID INTEGER PRIMARY KEY AUTOINCREMENT,
           jobID INTEGER NULL,
+          jobNo TEXT NULL,
           date TEXT NULL,
           bdnNo TEXT NULL,
           bargeBdnNo TEXT NULL,
@@ -72,7 +73,7 @@ class DatabaseHelper {
           regCode INTEGER NULL,
           value INTEGER NULL,
           spValue REAL NULL,
-          col_isSubmit INTEGER NULL,
+          isSubmit INTEGER NULL,
           $col_bitActive INTEGER NOT NULL DEFAULT 1,
           $col_createdBy INTEGER NULL,
           $col_createdAt TEXT NULL

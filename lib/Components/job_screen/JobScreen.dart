@@ -4,8 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../../Databases/bargeAllocation_queries.dart';
-import '../BDN/BDNIssueScreen.dart';
-import '../BDN/DeliveryNoteScreen/DeliveryNoteScreen.dart';
+import '../BDN/BDNInputScreen.dart';
 
 class JobScreen extends StatefulWidget {
   const JobScreen({Key? key, required this.selectedDate}) : super(key: key);
@@ -125,7 +124,7 @@ class _JobScreenState extends State<JobScreen> {
                                           // reverseDuration: Duration(milliseconds: 600),
                                           type: PageTransitionType.rightToLeftJoined,
                                           childCurrent: JobScreen(selectedDate: widget.selectedDate),
-                                          child: BDNIssueScreen(job: job),
+                                          child: BDNInputScreen(job: job),
                                           inheritTheme: true,
                                           ctx: context,
                                       ),

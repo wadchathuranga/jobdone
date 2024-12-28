@@ -6,19 +6,18 @@ import 'package:page_transition/page_transition.dart';
 
 import '../../Models/BDNModel.dart';
 import '../../core/stylesAndFormatting.dart';
-import 'BDNProcessScreen.dart';
-import 'DownloadJSONFile.dart';
+import 'BDNSaveScreen.dart';
 
-class BDNIssueScreen extends StatefulWidget {
-  const BDNIssueScreen({super.key, required this.job});
+class BDNInputScreen extends StatefulWidget {
+  const BDNInputScreen({super.key, required this.job});
 
   final dynamic job;
 
   @override
-  State<BDNIssueScreen> createState() => _BDNIssueScreenState();
+  State<BDNInputScreen> createState() => _BDNInputScreenState();
 }
 
-class _BDNIssueScreenState extends State<BDNIssueScreen> {
+class _BDNInputScreenState extends State<BDNInputScreen> {
   int currentStep = 0;
   bool isCompleted = false;
 
@@ -305,7 +304,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                       context,
                       PageTransition(
                         type: PageTransitionType.rightToLeft,
-                        child: BDNProcessScreen(bdnData: requestBody),
+                        child: BDNSaveScreen(bdnData: requestBody),
                         inheritTheme: true,
                         ctx: context,
                       ),
@@ -393,6 +392,7 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
     return BDN(
       /// Delivery Note
       jobID: widget.job['jobID'],
+      jobNo: widget.job['jobNo'].toString(),
       jobItemID: int.parse(selectedProduct),
       bdnNo: _jobWiseBDNNoController.text.toString(),
       bargeBdnNo: _bargeWiseBDNNoController.text.toString(),
@@ -470,17 +470,17 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
     return [
       SupConf(
         regCode: 'REG01',
-        value: isChecked1,
+        value: isChecked1 ? 1 : 0,
         spValue: -1,
       ),
       SupConf(
         regCode: 'REG02',
-        value: isChecked2,
+        value: isChecked2 ? 1 : 0,
         spValue: -1,
       ),
       SupConf(
         regCode: 'REG03',
-        value: isChecked3,
+        value: isChecked3 ? 1 : 0,
         spValue: _pslValueOfController.text.isNotEmpty
             ? double.parse(_pslValueOfController.text.trim())
             : 0,
@@ -774,8 +774,9 @@ class _BDNIssueScreenState extends State<BDNIssueScreen> {
                             _dateOfAlongSideController.text =
                                 DateFormat('yyyy-MM-dd').format(selectedDate);
                           });
-                          if (!mounted)
+                          if (!mounted) {
                             return; // Checks `this.mounted`, not `context.mounted`.
+                          }
                           FocusScope.of(context).requestFocus(FocusNode());
                         },
                         onTapOutside: (PointerDownEvent val) {

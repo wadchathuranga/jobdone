@@ -1,6 +1,7 @@
 class BDN {
   String? agncyBranchName;
   int? jobID;
+  String? jobNo;
   String? date;
   String? bdnNo;
   String? alongSide;
@@ -36,10 +37,12 @@ class BDN {
   String? berthedTypeCode;
   String? berthedLocation;
   String? bargeBdnNo;
+  int? isUpload;
 
   BDN(
       {this.agncyBranchName,
       this.jobID,
+      this.jobNo,
       this.date,
       this.bdnNo,
       this.alongSide,
@@ -74,12 +77,66 @@ class BDN {
       this.locationCode,
       this.berthedTypeCode,
       this.berthedLocation,
-      this.bargeBdnNo});
+      this.bargeBdnNo,
+      this.isUpload});
+
+  BDN.fromJson(Map<String, dynamic> json) {
+    agncyBranchName = json['agncyBranchName'];
+    jobID = json['jobID'];
+    jobNo = json['jobNo'];
+    date = json['date'];
+    bdnNo = json['bdnNo'];
+    alongSide = json['alongSide'];
+    pumpingCom = json['pumpingCom'];
+    comp = json['comp'];
+    jobItemID = json['jobItemID'];
+    jobProductCode = json['jobProductCode'];
+    viscocity = json['viscocity'];
+    waterContent = json['waterContent'];
+    sulphurContent = json['sulphurContent'];
+    density = json['density'];
+    flashPoint = json['flashPoint'];
+    grObVolume = json['grObVolume'];
+    grStVolumne = json['grStVolumne'];
+    qty = json['qty'];
+    barsixtyF = json['barsixtyF'];
+    temp = json['temp'];
+    if (json['supConf'] != null) {
+      supConf = <SupConf>[];
+      json['supConf'].forEach((v) {
+        supConf!.add(SupConf.fromJson(v));
+      });
+    }
+    nameStamp = json['nameStamp'];
+    fullName = json['fullName'];
+    remark = json['remark'];
+    createdBy = json['createdBy'];
+    agencyID = json['agencyID'];
+    companyID = json['companyID'];
+    if (json['sampleIssue'] != null) {
+      sampleIssue = <SampleIssue>[];
+      json['sampleIssue'].forEach((v) {
+        sampleIssue!.add(SampleIssue.fromJson(v));
+      });
+    }
+    etd = json['etd'];
+    etdTime = json['etdTime'];
+    grosstonnage = json['grosstonnage'];
+    owneroparator = json['owneroparator'];
+    nextPort = json['nextPort'];
+    dteVslETD = json['dteVslETD'];
+    locationCode = json['locationCode'];
+    berthedTypeCode = json['berthedTypeCode'];
+    berthedLocation = json['berthedLocation'];
+    bargeBdnNo = json['bargeBdnNo'];
+    isUpload = json['isUpload'];
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['agncyBranchName'] = agncyBranchName;
     data['jobID'] = jobID;
+    data['jobNo'] = jobNo;
     data['date'] = date;
     data['bdnNo'] = bdnNo;
     data['alongSide'] = alongSide;
@@ -119,16 +176,23 @@ class BDN {
     data['berthedTypeCode'] = berthedTypeCode;
     data['berthedLocation'] = berthedLocation;
     data['bargeBdnNo'] = bargeBdnNo;
+    data['isUpload'] = isUpload;
     return data;
   }
 }
 
 class SupConf {
   String? regCode;
-  bool? value;
+  int? value;
   double? spValue;
 
   SupConf({this.regCode, this.value, this.spValue});
+
+  SupConf.fromJson(Map<String, dynamic> json) {
+    regCode = json['regCode'];
+    value = json['value'];
+    spValue = json['spValue'];
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -145,6 +209,12 @@ class SampleIssue {
   String? issueParty;
 
   SampleIssue({this.sealNo, this.conSealNo, this.issueParty});
+
+  SampleIssue.fromJson(Map<String, dynamic> json) {
+    sealNo = json['sealNo'];
+    conSealNo = json['conSealNo'];
+    issueParty = json['issueParty'];
+  }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};

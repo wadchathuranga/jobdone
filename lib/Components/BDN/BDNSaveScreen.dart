@@ -3,21 +3,23 @@ import 'dart:developer' as developer;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:jobdone/Databases/bdn_queries.dart';
 import 'package:jobdone/Models/BDNModel.dart';
 
+import '../../core/CustomNotification.dart';
 import 'BDNUploadScreen.dart';
-import 'DownloadJSONFile.dart';
+import '../../core/DownloadJSONFile.dart';
 
-class BDNProcessScreen extends StatefulWidget {
-  const BDNProcessScreen({super.key, required this.bdnData});
+class BDNSaveScreen extends StatefulWidget {
+  const BDNSaveScreen({super.key, required this.bdnData});
 
   final BDN bdnData;
 
   @override
-  State<BDNProcessScreen> createState() => _BDNProcessScreenState();
+  State<BDNSaveScreen> createState() => _BDNSaveScreenState();
 }
 
-class _BDNProcessScreenState extends State<BDNProcessScreen> {
+class _BDNSaveScreenState extends State<BDNSaveScreen> {
   @override
   void initState() {
     super.initState();
@@ -80,10 +82,10 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
           //mainAxisAlignment: MainAxisAlignment.center,
           //mainAxisSize: MainAxisSize.max,
           children: [
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(10.0),
                   child: Text('BDN COMPLETION'),
                 ),
@@ -110,16 +112,22 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
                               height: 5,
                             ),
                             Text(
-                              'ISSUE BDN',
+                              'SAVE BDN',
                               textAlign: TextAlign.center,
                             ),
                           ],
                         ),
                       ),
                     ),
-                    onPressed: () {
-                      //TODO: upload BDN to the server DB
-
+                    onPressed: () async {
+                      //Save BDN to DB
+                      String? res = await BDNInfoDB.saveBDNInfoToDB(widget.bdnData);
+                      if (!mounted) {
+                        return;
+                      }
+                        CustomNotification.showInfo(
+                            context: context, message: res.toString());
+                        //TODO: upload BDN to the server DB
                       final snackBar = SnackBar(
                         content: const Text('BDN Uploading... Please Wait...'),
                         action: SnackBarAction(
@@ -162,7 +170,7 @@ class _BDNProcessScreenState extends State<BDNProcessScreen> {
                         //TODO: save BDN in BDN table of local DB
 
                         // Download BDN as a JSON File
-                        await downloadJSONFile(context, widget.bdnData);
+                        //await downloadJSONFile(context, widget.bdnData);
                       }),
               ],
             ),
