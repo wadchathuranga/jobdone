@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:jobdone/Databases/bdn_queries.dart';
 import 'package:jobdone/Models/BDNModel.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../core/CustomNotification.dart';
 import 'BDNUploadScreen.dart';
@@ -157,15 +158,19 @@ class _BDNSaveScreenState extends State<BDNSaveScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          if (!context.mounted) return;
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const BDNUploadScreen(),
+            PageTransition(
+              type: PageTransitionType.leftToRight,
+              child: const BDNUploadScreen(),
+              inheritTheme: true,
+              ctx: context,
             ),
           );
         }, // Icon inside the FAB
-        tooltip: 'Add',
-        child: const Icon(Icons.add), // Tooltip shown when the FAB is long-pressed
+        tooltip: 'BDN List',
+        child: const Icon(Icons.library_books), // Tooltip shown when the FAB is long-pressed
       ),
     );
   }

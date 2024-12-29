@@ -112,15 +112,15 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
       order: GroupedListOrder.DESC,
       useStickyGroupSeparators: true,
       groupSeparatorBuilder: (value) => Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(top: 8.0, left: 8.0),
         child: Text(
           value.toString(),
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       itemBuilder: (c, element) {
         return Card(
-          elevation: 3,
+          elevation: 5,
           child: Slidable(
             key: ValueKey(element['bdnID']),
             closeOnScroll: true,  // Closes when list is scrolled
