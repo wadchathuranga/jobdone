@@ -181,11 +181,11 @@ class _BDNSaveScreenState extends State<BDNSaveScreen> {
     bool res = await BDNInfoDB.saveBDNInfoToDB(widget.bdnData);
 
     if (res) {
-      msg = "BDN SAVE SUCCESS.";
+      msg = "BDN Saved.";
       if (!mounted) return;
       CustomNotification.showSuccess(context: context, message: msg);
     } else {
-      msg = "BDN ALREADY COMPLETED!";
+      msg = "BDN Already Completed!";
       if (!mounted) return;
       CustomNotification.showInfo(context: context, message: msg);
     }
