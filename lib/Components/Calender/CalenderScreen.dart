@@ -1,10 +1,7 @@
-import 'dart:async';
-import 'dart:developer' as developer;
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:jobdone/Databases/bargePara_queries.dart';
 import 'package:jobdone/Databases/locationAndBerthedType_queries.dart';
 import 'package:jobdone/services/bargeParaService.dart';
@@ -14,6 +11,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../Databases/bargeAllocation_queries.dart';
 import '../../services/bargeAllocationService.dart';
 import '../../services/locationAndBerthedTypeService.dart';
+import '../BDN/BDNUploadScreen.dart';
 import '../Jobs/JobScreen.dart';
 
 class CalenderScreen extends StatefulWidget {
@@ -77,7 +75,7 @@ class _CalenderScreenState extends State<CalenderScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                            'Cell Date of Tapped on Cell: ${cellDate} \nCount: ${jobs!.length}'),
+                            'Cell Date of Tapped on Cell: $cellDate \nCount: ${jobs!.length}'),
                       ),
                     );
 
@@ -118,6 +116,22 @@ class _CalenderScreenState extends State<CalenderScreen> {
                   }
                 },
               ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          if (!context.mounted) return;
+          Navigator.push(
+            context,
+            PageTransition(
+              type: PageTransitionType.leftToRight,
+              child: const BDNUploadScreen(),
+              inheritTheme: true,
+              ctx: context,
+            ),
+          );
+        }, // Icon inside the FAB
+        tooltip: 'BDN List',
+        child: const Icon(Icons.library_books), // Tooltip shown when the FAB is long-pressed
       ),
     );
   }

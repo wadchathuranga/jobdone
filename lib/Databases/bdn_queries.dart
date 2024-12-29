@@ -13,8 +13,8 @@ class BDNInfoDB {
   static const String tblBargePara = 'BargePara_table';
 
   // SAVE: BDN save into DB
-  static Future<String?> saveBDNInfoToDB(BDN bdnInfo) async {
-    String msg = '';
+  static Future<bool> saveBDNInfoToDB(BDN bdnInfo) async {
+    bool isSuccess = false;
     try {
       final db = await DatabaseHelper.db();
 
@@ -167,7 +167,6 @@ class BDNInfoDB {
                         ]);
           });
 
-          msg = "BDN SAVE SUCCESS.";
 
           // Update the jobItem Status
           await txn.rawUpdate(
@@ -180,6 +179,7 @@ class BDNInfoDB {
 
           // Update barge wise BDN sequence
           int userID = 15; //TODO: get userID from the token
+
           List<Map<String, dynamic>> bargeParaFromDB = await txn.rawQuery(
             'SELECT numUserID, numBargeID, numBargeBDNSequence FROM $tblBargePara WHERE numUserID = ?',
             [userID],
@@ -194,9 +194,11 @@ class BDNInfoDB {
               ],
             );
           }
+
+          isSuccess = true;
         } else {
           print("========= Already Saved BDN =============| $jobItems |");
-          msg = "BDN Already Saved!";
+          isSuccess = false;
         }
       });
     } catch (err) {
@@ -204,7 +206,7 @@ class BDNInfoDB {
       throw Exception(err.toString());
     }
 
-    return msg;
+    return isSuccess;
   }
 
   /// GET: Get a full BDN by jobItemID

@@ -119,29 +119,7 @@ class _BDNSaveScreenState extends State<BDNSaveScreen> {
                         ),
                       ),
                     ),
-                    onPressed: () async {
-                      //Save BDN to DB
-                      String? res = await BDNInfoDB.saveBDNInfoToDB(widget.bdnData);
-                      if (!mounted) {
-                        return;
-                      }
-                        CustomNotification.showInfo(
-                            context: context, message: res.toString());
-                        //TODO: upload BDN to the server DB
-                      final snackBar = SnackBar(
-                        content: const Text('BDN Uploading... Please Wait...'),
-                        action: SnackBarAction(
-                          label: 'Dismiss',
-                          onPressed: () {
-                            // Perform an action
-                          },
-                        ),
-                        duration: const Duration(
-                            seconds: 3), // Duration the snackbar is visible
-                      );
-
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                    },
+                    onPressed: _saveBDNInfo,
                   )
                 else
                   ElevatedButton(
@@ -182,13 +160,43 @@ class _BDNSaveScreenState extends State<BDNSaveScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BDNUploadScreen(),
+              builder: (context) => const BDNUploadScreen(),
             ),
           );
-        },
-        child: Icon(Icons.add), // Icon inside the FAB
-        tooltip: 'Add', // Tooltip shown when the FAB is long-pressed
+        }, // Icon inside the FAB
+        tooltip: 'Add',
+        child: const Icon(Icons.add), // Tooltip shown when the FAB is long-pressed
       ),
     );
+  }
+
+  void _saveBDNInfo() async {
+    var msg = "";
+
+    bool res = await BDNInfoDB.saveBDNInfoToDB(widget.bdnData);
+
+    if (res) {
+      msg = "BDN SAVE SUCCESS.";
+      if (!mounted) return;
+      CustomNotification.showSuccess(context: context, message: msg);
+    } else {
+      msg = "BDN ALREADY COMPLETED!";
+      if (!mounted) return;
+      CustomNotification.showInfo(context: context, message: msg);
+    }
+
+    //TODO: upload BDN to the server DB
+
+    // final snackBar = SnackBar(
+    //   content: const Text('BDN Uploading... Please Wait...'),
+    //   action: SnackBarAction(
+    //     label: 'Dismiss',
+    //     onPressed: () {
+    //       // Perform an action
+    //     },
+    //   ),
+    //   duration: const Duration(seconds: 3),
+    // );
+    // ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
