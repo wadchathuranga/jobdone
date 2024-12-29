@@ -7,7 +7,7 @@ import '../../Databases/bargeAllocation_queries.dart';
 import '../BDN/BDNInputScreen.dart';
 
 class JobScreen extends StatefulWidget {
-  const JobScreen({Key? key, required this.selectedDate}) : super(key: key);
+  const JobScreen({super.key, required this.selectedDate});
 
   final DateTime selectedDate;
 
@@ -18,6 +18,7 @@ class JobScreen extends StatefulWidget {
 class _JobScreenState extends State<JobScreen> {
   late String convtDate;
   List jobList = [];
+  List incompleteJobItems = [];
 
   @override
   void initState() {
@@ -35,7 +36,7 @@ class _JobScreenState extends State<JobScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Job Details'),
+        title: const Text('Job List'),
       ),
       body: Column(
         children: [
@@ -62,6 +63,9 @@ class _JobScreenState extends State<JobScreen> {
   }
 
   Widget _expandableTile(job) {
+    incompleteJobItems =
+        job['jobItems'].where((item) => item['isItemExist'] == 0).toList();
+
     return Padding(
       padding: const EdgeInsets.only(top: 10.0),
       child: Column(
@@ -115,20 +119,38 @@ class _JobScreenState extends State<JobScreen> {
                                     size: 20,
                                   ),
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      PageTransition(
+                                    if (incompleteJobItems.isNotEmpty) {
+                                      Navigator.push(
+                                        context,
+                                        PageTransition(
                                           // alignment: Alignment.bottomCenter,
                                           // curve: Curves.easeInOut,
                                           // duration: Duration(milliseconds: 600),
                                           // reverseDuration: Duration(milliseconds: 600),
-                                          type: PageTransitionType.rightToLeftJoined,
-                                          childCurrent: JobScreen(selectedDate: widget.selectedDate),
+                                          type: PageTransitionType
+                                              .rightToLeftJoined,
+                                          childCurrent: JobScreen(
+                                              selectedDate:
+                                                  widget.selectedDate),
                                           child: BDNInputScreen(job: job),
                                           inheritTheme: true,
                                           ctx: context,
-                                      ),
-                                    );
+                                        ),
+                                      );
+                                    } else {
+                                      final snackBar = SnackBar(
+                                        content: const Text(
+                                            'All Job Items Already Completed!'),
+                                        action: SnackBarAction(
+                                          label: 'Dismiss',
+                                          onPressed: () {
+                                            // Perform an action
+                                          },
+                                        ),
+                                        duration: const Duration(seconds: 3),
+                                      );
+                                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                    }
                                     // Navigator.push(
                                     //   context,
                                     //   MaterialPageRoute(

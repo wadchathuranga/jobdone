@@ -14,7 +14,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../Databases/bargeAllocation_queries.dart';
 import '../../services/bargeAllocationService.dart';
 import '../../services/locationAndBerthedTypeService.dart';
-import '../job_screen/JobScreen.dart';
+import '../Jobs/JobScreen.dart';
 
 class CalenderScreen extends StatefulWidget {
   const CalenderScreen({super.key});
@@ -31,8 +31,8 @@ class _CalenderScreenState extends State<CalenderScreen> {
   void initState() {
     super.initState();
 
-    getBargeParaData();
     getBargeAllocationData();
+    getBargeParaData();
     getPortLocationsData();
     getBerthedTypesData();
 
@@ -50,9 +50,11 @@ class _CalenderScreenState extends State<CalenderScreen> {
         ],
       ),
       body: SafeArea(
-        child: jobsList.isEmpty
-            ? const Center(child: CircularProgressIndicator())
-            : SfCalendar(
+        child:
+        // jobsList.isEmpty
+        //     ? const Center(child: CircularProgressIndicator())
+        //     :
+        SfCalendar(
                 view: CalendarView.month,
                 dataSource: JobDataSource(_getDataSource()),
                 monthViewSettings: const MonthViewSettings(

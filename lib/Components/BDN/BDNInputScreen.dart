@@ -149,7 +149,9 @@ class _BDNInputScreenState extends State<BDNInputScreen> {
     genBargeWiseBDNNo();
 
     ///=== Step_02 - Fuel Characteristics ===///
-    productList = widget.job['jobItems'];
+    productList = widget.job['jobItems']
+        .where((item) => item['isItemExist'] == 0)
+        .toList();
 
     ///=== Step_03 - Quantity ===///
 
@@ -386,14 +388,12 @@ class _BDNInputScreenState extends State<BDNInputScreen> {
     );
   }
 
-
-
   BDN makeObjBDN() {
     return BDN(
       /// Delivery Note
       jobID: widget.job['jobID'],
       jobNo: widget.job['jobNo'].toString(),
-      jobItemID: int.parse(selectedProduct),
+      jobItemID: selectedProduct != null ? int.parse(selectedProduct) : null,
       bdnNo: _jobWiseBDNNoController.text.toString(),
       bargeBdnNo: _bargeWiseBDNNoController.text.toString(),
       dteVslETD: null,
@@ -405,11 +405,11 @@ class _BDNInputScreenState extends State<BDNInputScreen> {
       alongSide: null,
       pumpingCom: null,
       comp: null,
-      jobProductCode: productList
-          .firstWhere(
-            (product) => product['jobItemDtID'] == int.parse(selectedProduct),
-          )
-          ['productCode'],
+      jobProductCode: selectedProduct != null
+          ? productList.firstWhere(
+              (product) => product['jobItemDtID'] == int.parse(selectedProduct),
+            )['productCode']
+          : null,
 
       /// Fuel Characteristic
       viscocity: _viscocityController.text.isNotEmpty

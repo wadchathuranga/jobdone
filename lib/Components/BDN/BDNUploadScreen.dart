@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:intl/intl.dart';
 import 'package:jobdone/Models/BDNModel.dart';
 
 import '../../Databases/bdn_queries.dart';
@@ -94,104 +95,6 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
             SlidableAutoCloseBehavior(
               closeWhenOpened: true,
               child: _createGroupedListView(),
-              // child: ListView.builder(
-              //   shrinkWrap: true,
-              //   itemCount: bdnList.length,
-              //   itemBuilder: (BuildContext context, int index) {
-              //     return Card(
-              //       elevation: 3,
-              //       child: Slidable(
-              //         key: ValueKey(index),
-              //         startActionPane: ActionPane(
-              //           motion: const DrawerMotion(),
-              //           children: [
-              //             SlidableAction(
-              //               autoClose: false,
-              //               onPressed: (_) {
-              //                 _onDismissed(Actions.delete, bdnList[index]);
-              //               },
-              //               backgroundColor: const Color(0xFFFE4A49),
-              //               foregroundColor: Colors.white,
-              //               icon: Icons.delete,
-              //               label: 'Delete',
-              //             ),
-              //           ],
-              //         ),
-              //         endActionPane: ActionPane(
-              //           motion: const DrawerMotion(),
-              //           children: [
-              //             SlidableAction(
-              //               onPressed: (_) => _uploadBDN(),
-              //               backgroundColor: const Color(0xFF0392CF),
-              //               foregroundColor: Colors.white,
-              //               icon: Icons.cloud_upload,
-              //               label: 'Upload',
-              //             ),
-              //             SlidableAction(
-              //               onPressed: (_) => _downloadJSON(),
-              //               backgroundColor: Colors.green,
-              //               foregroundColor: Colors.white,
-              //               icon: Icons.save,
-              //               label: 'JSON',
-              //             ),
-              //           ],
-              //         ),
-              //         child: Padding(
-              //           padding: const EdgeInsets.all(5.0),
-              //           child: ListTile(
-              //             title: Text(bdnList[index].bdnNo!),
-              //             subtitle: Column(
-              //               crossAxisAlignment: CrossAxisAlignment.start,
-              //               children: [
-              //                 Row(
-              //                   children: [
-              //                     Text(bdnList[index].jobNo.toString()),
-              //                     Text('  |  '),
-              //                     Text('LSFO'),
-              //                   ],
-              //                 ),
-              //                 Text(DateTime.now().toString()),
-              //               ],
-              //             ),
-              //             trailing: Row(
-              //               mainAxisSize: MainAxisSize.min,
-              //               children: [
-              //                 if (!isConnected)
-              //                   const IconButton(
-              //                     icon: Icon(
-              //                       Icons.signal_wifi_connected_no_internet_4,
-              //                       color: Colors.red,
-              //                       size: 35,
-              //                     ),
-              //                     onPressed: null,
-              //                   )
-              //                 else if (bdnList[index].isUpload == true)
-              //                   const IconButton(
-              //                     icon: Icon(
-              //                       Icons.cloud_done,
-              //                       color: Colors.green,
-              //                       size: 35,
-              //                     ),
-              //                     onPressed: null,
-              //                   )
-              //                 else if (bdnList[index].isUpload == false)
-              //                   const IconButton(
-              //                     icon: Icon(
-              //                       Icons.cloud_upload,
-              //                       color: Colors.blue,
-              //                       size: 35,
-              //                     ),
-              //                     onPressed: null,
-              //                   ),
-              //               ],
-              //             ),
-              //             onTap: null,
-              //           ),
-              //         ),
-              //       ),
-              //     );
-              //   },
-              // ),
             ),
           ],
         ),
@@ -241,10 +144,8 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                 SlidableAction(
                   autoClose: true,
                   onPressed: (_) async {
-                    final controller2 = Slidable.of(context);
                     final result = await _showDeleteConfirmation();
                     if (!result) {
-                      controller2?.close();
                       return;// Manually close if cancelled
                     }
                     deleteBdnFromDB(element);
@@ -260,14 +161,14 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
               motion: const DrawerMotion(),
               children: [
                 SlidableAction(
-                  onPressed: (_) => _uploadBDN(element['jobItemID'], element['bdnID']),
+                  onPressed: (_) => _uploadBDN(element['jobItemID']),
                   backgroundColor: const Color(0xFF0392CF),
                   foregroundColor: Colors.white,
                   icon: Icons.cloud_upload,
                   label: 'Upload',
                 ),
                 SlidableAction(
-                  onPressed: (_) => _downloadJSON(element['jobItemID'], element['bdnID']),
+                  onPressed: (_) => _downloadJSON(element['jobItemID']),
                   backgroundColor: Colors.green,
                   foregroundColor: Colors.white,
                   icon: Icons.save,
@@ -289,7 +190,7 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                         Text(element['jobProductCode'].toString()),
                       ],
                     ),
-                    Text(DateTime.now().toString()),
+                    Text(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(element['createdAt']))),
                   ],
                 ),
                 trailing: Row(
@@ -333,10 +234,11 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
     );
   }
 
-  Future<void> _uploadBDN(int jobItemID, int bdnID) async {
+  /// UPLOAD METHOD
+  Future<void> _uploadBDN(int jobItemID) async {
     // TODO: check BDN already uploaded or not
 
-    BDN bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID, bdnID);
+    BDN bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID);
 
     // TODO: create API call to upload BDN to server
 
@@ -350,8 +252,9 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
     );
   }
 
-  Future<void> _downloadJSON(int jobItemID, int bdnID) async {
-    BDN bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID, bdnID);
+  /// DOWNLOAD JSON FILE METHOD
+  Future<void> _downloadJSON(int jobItemID) async {
+    BDN bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID);
 
     // Download BDN as a JSON File
     if(!mounted){
@@ -366,6 +269,16 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
       context: context,
       message: "BDN ${bdnInfo.bdnNo} Downloaded.",
     );
+  }
+
+  /// DELETE METHOD
+  void deleteBdnFromDB(element) {
+    //TODO: make this proper way on the DB side as well
+
+    setState(() {
+      bdnList.removeWhere((item) =>
+      item['bdnID'] == element['bdnID']);
+    });
   }
 
   /// Alert dialog for delete confirmation
@@ -391,13 +304,6 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
     ) ?? false;
   }
 
-  deleteBdnFromDB(element) {
-    //TODO: make this proper way on the DB side as well
 
-    setState(() {
-      bdnList.removeWhere((item) =>
-      item['bdnID'] == element['bdnID']);
-    });
-  }
 
 }

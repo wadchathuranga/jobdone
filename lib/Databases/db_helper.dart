@@ -70,6 +70,7 @@ class DatabaseHelper {
         CREATE TABLE $tblConfCheck(
           $col_id INTEGER PRIMARY KEY AUTOINCREMENT,
           bdnID INTEGER NOT NULL,
+          jobItemID INTEGER NULL,
           regCode INTEGER NULL,
           value INTEGER NULL,
           spValue REAL NULL,
@@ -84,6 +85,7 @@ class DatabaseHelper {
         CREATE TABLE $tblSealNos(
           $col_id INTEGER PRIMARY KEY AUTOINCREMENT,
           bdnID INTEGER NOT NULL,
+          jobItemID INTEGER NULL,
           sealNo TEXT NULL,
           conSealNo TEXT NULL,
           issueParty TEXT NULL,

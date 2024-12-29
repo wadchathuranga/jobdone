@@ -1,3 +1,6 @@
+import 'package:intl/intl.dart';
+import 'package:jobdone/Databases/bargePara_queries.dart';
+
 import '../Models/BDNModel.dart';
 import 'db_helper.dart';
 
@@ -5,6 +8,9 @@ class BDNInfoDB {
   static const String tblBDN = 'BDN_table';
   static const String tblConfCheck = 'ConfCheck_table';
   static const String tblSealNos = 'SealNos_table';
+  static const String tblBargeAllocation = 'BargeAllocation_table';
+  static const String tblJobItem = 'JobItem_table';
+  static const String tblBargePara = 'BargePara_table';
 
   // SAVE: BDN save into DB
   static Future<String?> saveBDNInfoToDB(BDN bdnInfo) async {
@@ -18,7 +24,6 @@ class BDNInfoDB {
             'SELECT jobItemID FROM $tblBDN WHERE jobItemID = ?',
             [bdnInfo.jobItemID]);
 
-        print("========= Already Saved BDN =============| $jobItems |");
 
         if (jobItems.isEmpty) {
           //INSERT BDN INFO TO LOCAL DB
@@ -99,7 +104,7 @@ class BDNInfoDB {
                                       0, // isUpload
                                       1, // bitActive
                                       333, // createdBy
-                                      null // createdAt
+                                      DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(DateTime.now()) // createdAt
                                   ]);
 
           print('Inserted record ID: $bdnID');
@@ -109,6 +114,7 @@ class BDNInfoDB {
             int supConId = await txn.rawInsert('''
                                   INSERT INTO $tblConfCheck (
                                     bdnID,
+                                    jobItemID,
                                     regCode,
                                     value,
                                     spValue,
@@ -117,17 +123,18 @@ class BDNInfoDB {
                                     createdBy,
                                     createdAt
                                   ) VALUES (
-                                    ?, ?, ?, ?, ?, ?, ?, ?
+                                    ?, ?, ?, ?, ?, ?, ?, ?, ?
                                   )
                                 ''', [
                                         bdnID, // bdnID
+                                        bdnInfo.jobItemID, // jobItemID
                                         supConf.regCode, // regCode
                                         supConf.value, // value
                                         supConf.spValue, // spValue
                                         0, // isSubmit
                                         1, // bitActive
                                         333, // createdBy
-                                        null // createdAt
+                                        DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(DateTime.now()) // createdAt
                                       ]);
 
             print('Inserted record ID (tblConfCheck): $supConId');
@@ -138,6 +145,7 @@ class BDNInfoDB {
             await txn.rawInsert('''
                     INSERT INTO $tblSealNos (
                       bdnID,
+                      jobItemID,
                       sealNo,
                       conSealNo,
                       issueParty,
@@ -145,23 +153,49 @@ class BDNInfoDB {
                       createdBy,
                       createdAt
                     ) VALUES (
-                      ?, ?, ?, ?, ?, ?, ?
+                      ?, ?, ?, ?, ?, ?, ?, ?
                     )
                   ''', [
                           bdnID, // bdnID
+                          bdnInfo.jobItemID, // jobItemID
                           sampleIssue.sealNo, // sealNo
                           sampleIssue.conSealNo, // conSealNo
                           sampleIssue.issueParty, // issueParty
                           1, // bitActive
                           333, // createdBy
-                          null // createdAt
+                          DateFormat('yyyy-MM-dd HH:mm:ss.SSS').format(DateTime.now()) // createdAt
                         ]);
           });
 
-          print("BDN SAVE SUCCESS.");
           msg = "BDN SAVE SUCCESS.";
+
+          // Update the jobItem Status
+          await txn.rawUpdate(
+            'UPDATE $tblJobItem SET isItemExist = ? WHERE jobItemDtID = ?',
+            [
+              1,
+              bdnInfo.jobItemID,
+            ],
+          );
+
+          // Update barge wise BDN sequence
+          int userID = 15; //TODO: get userID from the token
+          List<Map<String, dynamic>> bargeParaFromDB = await txn.rawQuery(
+            'SELECT numUserID, numBargeID, numBargeBDNSequence FROM $tblBargePara WHERE numUserID = ?',
+            [userID],
+          );
+
+          if (bargeParaFromDB.isNotEmpty ) {
+            await txn.rawUpdate(
+              'UPDATE $tblBargePara SET numBargeBDNSequence = ? WHERE numUserID = ?',
+              [
+                int.parse(bargeParaFromDB[0]['numBargeBDNSequence'].toString()) + 1,
+                userID,
+              ],
+            );
+          }
         } else {
-          print("BDN Already Saved!");
+          print("========= Already Saved BDN =============| $jobItems |");
           msg = "BDN Already Saved!";
         }
       });
@@ -173,9 +207,9 @@ class BDNInfoDB {
     return msg;
   }
 
-  // GET: Get a full BDN by
-  static Future<BDN> getBDNByJobItemID(int jobItemID, int bdnID) async {
-    // try {
+  /// GET: Get a full BDN by jobItemID
+  static Future<BDN> getBDNByJobItemID(int jobItemID) async {
+    try {
 
       BDN bdnResult = BDN();
 
@@ -183,22 +217,19 @@ class BDNInfoDB {
 
       List<Map<String, dynamic>> result = await db.query(
           tblBDN,
-          where: 'jobItemID=? AND bdnID=?',
-          whereArgs: [jobItemID.toString(), bdnID.toString()]);
+          where: 'jobItemID=?',
+          whereArgs: [jobItemID.toString()]);
 
 
       // get jobItems and bind to the main job
       if (result.isNotEmpty) {
-        // Map<String, dynamic> newMap = Map<String, dynamic>.from(bdnResult.first);
-        // print(newMap);
-        // bdnList.add(newMap);
 
         bdnResult = result.map((row) => BDN.fromJson(row)).first;
 
         List<Map<String, dynamic>> confCheckResult = await db.query(
             tblConfCheck,
-            where: 'bdnID=?',
-            whereArgs: [bdnID.toString()]);
+            where: 'jobItemID=?',
+            whereArgs: [jobItemID.toString()]);
 
         // bind the confCheckResult to main list
         print(confCheckResult);
@@ -207,30 +238,43 @@ class BDNInfoDB {
 
         List<Map<String, dynamic>> sealNosResult = await db.query(
             tblSealNos,
-            where: 'bdnID=?',
-            whereArgs: [bdnID.toString()]);
+            where: 'jobItemID=?',
+            whereArgs: [jobItemID.toString()]);
 
         // bind the sealNosResult to main list
         print(sealNosResult);
         bdnResult.sampleIssue = sealNosResult.map((row) => SampleIssue.fromJson(row)).toList();
       }
 
-      print('====== BDN FETCHE ====== \n$bdnResult');
+      print('====== BDN FETCHES ====== \n$bdnResult');
       return bdnResult;
-    // } catch (err) {
-    //   print(err.toString());
-    //   throw Exception(err.toString());
-    // }
+    } catch (err) {
+      print(err.toString());
+      throw Exception(err.toString());
+    }
   }
 
-  // GET: Get only few BDN data
+  /// GET: Get only few BDN data
   static Future<List<Map<String, dynamic>>> getJobListByDate() async {
     try {
       final db = await DatabaseHelper.db();
 
       List<Map<String, dynamic>> bdnList = [];
 
-      List<Map<String, dynamic>> result = await db.query(tblBDN);
+      List<Map<String, dynamic>> result = await db.query(
+          tblBDN,
+          columns: [
+            'jobID',
+            'jobNo',
+            'bdnNo',
+            'bdnID',
+            'jobItemID',
+            'bargeBdnNo',
+            'jobProductCode',
+            'isUpload',
+            'createdAt',
+          ],
+      );
 
       for (var row in result) {
         Map<String, dynamic> newMap = Map<String, dynamic>.from(row);
@@ -239,6 +283,27 @@ class BDNInfoDB {
 
       print('====== SAVED BDN LIST FETCHES ====== \n$bdnList');
       return bdnList;
+    } catch (err) {
+      print(err.toString());
+      throw Exception(err.toString());
+    }
+  }
+
+  /// PATCH: Update BDN uploading status ny bdnID
+  static void updateBDNByJobItemID(int jobItemID) async {
+    try {
+
+      final db = await DatabaseHelper.db();
+
+      int result = await db.update(
+          tblJobItem,
+          {
+            'isItemExist': 1,
+          },
+          where: 'jobItemDtID=?',
+          whereArgs: [jobItemID.toString()]);
+
+      print('====== JOB ITEM STATUS UPDATED ====== \n$result');
     } catch (err) {
       print(err.toString());
       throw Exception(err.toString());

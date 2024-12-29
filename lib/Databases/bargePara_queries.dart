@@ -54,4 +54,33 @@ class BargeParaDB {
       throw Exception(err.toString());
     }
   }
+
+  // UPDATE: barge para by userID
+  static void updateBargeParaByUserID(int userID) async {
+    try {
+      final db = await DatabaseHelper.db();
+
+      await db.transaction((txn) async {
+        List<Map<String, dynamic>> bargeParaFromDB = await txn.rawQuery(
+            'SELECT numUserID, numBargeID, numBargeBDNSequence FROM $tblBargePara WHERE numUserID = ?',
+            [userID],
+        );
+
+        if (bargeParaFromDB.isNotEmpty ) {
+          await txn.rawUpdate(
+              'UPDATE $tblBargePara SET numBargeBDNSequence = ? WHERE numUserID = ?',
+              [
+                int.parse(bargeParaFromDB[0]['bargeBDNSequence']) + 1,
+                userID,
+              ],
+          );
+        }
+
+        print('====== BARGE WISE BDN SEQUENCE UPDATED ======');
+      });
+    } catch (err) {
+      print(err.toString());
+      throw Exception(err.toString());
+    }
+  }
 }
