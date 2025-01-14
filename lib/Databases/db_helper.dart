@@ -73,11 +73,7 @@ class DatabaseHelper {
           jobItemID INTEGER NULL,
           regCode INTEGER NULL,
           value INTEGER NULL,
-          spValue REAL NULL,
-          isSubmit INTEGER NULL,
-          $col_bitActive INTEGER NOT NULL DEFAULT 1,
-          $col_createdBy INTEGER NULL,
-          $col_createdAt TEXT NULL
+          spValue REAL NULL
         )
     ''');
 
@@ -88,10 +84,7 @@ class DatabaseHelper {
           jobItemID INTEGER NULL,
           sealNo TEXT NULL,
           conSealNo TEXT NULL,
-          issueParty TEXT NULL,
-          $col_bitActive INTEGER NOT NULL DEFAULT 1,
-          $col_createdBy INTEGER NULL,
-          $col_createdAt TEXT NULL
+          issueParty TEXT NULL
         )
     ''');
 

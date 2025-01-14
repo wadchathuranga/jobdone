@@ -7,10 +7,10 @@ import 'package:permission_handler/permission_handler.dart';
 import '../Models/BDNModel.dart';
 import 'CustomNotification.dart';
 
-Future<void> downloadJSONFile(BuildContext context, BDN bdnObj) async {
+Future<void> downloadJSONFile(BuildContext context, Map<String, dynamic> bdnObj) async {
   try {
     // Convert the object to JSON
-    String jsonString = jsonEncode(bdnObj.toJson());
+    String jsonString = jsonEncode(bdnObj);
 
     String? downloadPath = await getDownloadPath(context);
 
@@ -19,7 +19,7 @@ Future<void> downloadJSONFile(BuildContext context, BDN bdnObj) async {
       return;
     }
 
-    String filePath = "$downloadPath/${bdnObj.bargeBdnNo}.json";
+    String filePath = "$downloadPath/${bdnObj['bargeBdnNo']}.json";
 
     // Write the content to the file
     File file = File(filePath);

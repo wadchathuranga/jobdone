@@ -396,15 +396,14 @@ class _BDNInputScreenState extends State<BDNInputScreen> {
       jobItemID: selectedProduct != null ? int.parse(selectedProduct) : null,
       bdnNo: _jobWiseBDNNoController.text.toString(),
       bargeBdnNo: _bargeWiseBDNNoController.text.toString(),
-      dteVslETD: null,
       locationCode: selectedPortOfDelivery,
       berthedTypeCode: selectedLocationOfSupply,
       berthedLocation: _terminalController.text.trim().isNotEmpty
           ? _terminalController.text
-          : '',
-      alongSide: null,
-      pumpingCom: null,
-      comp: null,
+          : null,
+      alongSide: DateTime.now().toIso8601String(),
+      pumpingCom: DateTime.now().toIso8601String(),
+      comp: DateTime.now().toIso8601String(),
       jobProductCode: selectedProduct != null
           ? productList.firstWhere(
               (product) => product['jobItemDtID'] == int.parse(selectedProduct),
@@ -440,10 +439,10 @@ class _BDNInputScreenState extends State<BDNInputScreen> {
           : null,
       barsixtyF: _barrelsAt60FController.text.isNotEmpty
           ? double.parse(_barrelsAt60FController.text.trim())
-          : null,
+          : 0,
       temp: _temperatureController.text.isNotEmpty
           ? double.parse(_temperatureController.text.trim())
-          : null,
+          : 0,
 
       /// Supplier Confirmation
       supConf: supplierConfirmationList(),
@@ -451,13 +450,16 @@ class _BDNInputScreenState extends State<BDNInputScreen> {
           ? double.parse(_vesselGrossTonnageController.text.trim())
           : null,
       owneroparator: _vesselOwnerOperatorController.text,
-      //TODO: check this vesselETD necessary or not
+      dteVslETD: DateTime.now().toIso8601String(),
       nextPort: _vesselNextPortController.text,
       nameStamp: _companyNameController.text,
       fullName: _fullNameController.text,
 
       /// Master Chief's Acknowledgement
       sampleIssue: sampleIssueList(),
+      remark: _remarkController.text.isNotEmpty
+          ? _remarkController.text
+          : null,
 
       /// Others
       companyID: 99,
@@ -493,56 +495,56 @@ class _BDNInputScreenState extends State<BDNInputScreen> {
       SampleIssue(
         sealNo: _vesselSN1Controller.text.trim().isNotEmpty
             ? _vesselSN1Controller.text
-            : "",
+            : null,
         conSealNo: _vesselCSN1Controller.text.trim().isNotEmpty
             ? _vesselCSN1Controller.text
-            : "",
+            : null,
         issueParty: "VESSL",
       ),
       SampleIssue(
         sealNo: _vesselSN2Controller.text.trim().isNotEmpty
             ? _vesselSN1Controller.text
-            : "",
+            : null,
         conSealNo: _vesselCSN1Controller.text.trim().isNotEmpty
             ? _vesselCSN2Controller.text
-            : "",
+            : null,
         issueParty: "VESSL",
       ),
       SampleIssue(
         sealNo: _bunkerTankerSN1Controller.text.trim().isNotEmpty
             ? _bunkerTankerSN1Controller.text
-            : "",
+            : null,
         conSealNo: _bunkerTankerCSN1Controller.text.trim().isNotEmpty
             ? _bunkerTankerCSN1Controller.text
-            : "",
+            : null,
         issueParty: "BNTN",
       ),
       SampleIssue(
         sealNo: _bunkerTankerSN2Controller.text.trim().isNotEmpty
             ? _bunkerTankerSN1Controller.text
-            : "",
+            : null,
         conSealNo: _bunkerTankerCSN2Controller.text.trim().isNotEmpty
             ? _bunkerTankerCSN1Controller.text
-            : "",
+            : null,
         issueParty: "BNTN",
       ),
       SampleIssue(
         sealNo: _surveyorSNController.text.trim().isNotEmpty
             ? _surveyorSNController.text
-            : "",
+            : null,
         conSealNo: _surveyorCSNController.text.trim().isNotEmpty
             ? _surveyorCSNController.text
-            : "",
+            : null,
         issueParty: "SURV",
       ),
       SampleIssue(
         sealNo: _otherSNController.text.trim().isNotEmpty
             ? _otherSNController.text
-            : "",
+            : null,
         conSealNo: _otherCSNController.text.trim().isNotEmpty
             ? _otherCSNController.text
-            : "",
-        issueParty: "OTHER",
+            : null,
+        issueParty: "OTHE",
       ),
     ];
   }

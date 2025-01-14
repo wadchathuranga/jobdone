@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
-import 'package:jobdone/Models/BDNModel.dart';
+import 'package:jobdone/services/bdnService.dart';
 
 import '../../Databases/bdn_queries.dart';
-import '../../Models/BDNModel.dart';
+import '../../Models/ApiResponse.dart';
+import '../../Models/DbResponseModel.dart';
 import '../../core/CustomNotification.dart';
 import '../../core/DownloadJSONFile.dart';
 
@@ -46,7 +48,6 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
   void getBdnList() async {
     bdnList = (await BDNInfoDB.getJobListByDate());
   }
-
 
   ///----------------------- Internet Connectivity -----------------------
   bool isConnected = true;
@@ -121,52 +122,73 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
       itemBuilder: (c, element) {
         return Card(
           elevation: 5,
+          // color: Colors.redAccent,
           child: Slidable(
             key: ValueKey(element['bdnID']),
-            closeOnScroll: true,  // Closes when list is scrolled
-            startActionPane: ActionPane(
-              motion: const DrawerMotion(),
-              dismissible: DismissiblePane(
-                  closeOnCancel: true,  // Close on cancel tap
-                  confirmDismiss: () async {
-                    final controller = Slidable.of(context);
-                    final result = await _showDeleteConfirmation();
-                    if (!result) {
-                      controller?.close();  // Manually close if cancelled
-                    }
-                    return result;
-                  },
-                  onDismissed: () {
-                    deleteBdnFromDB(element);
-                  },
-              ),
-              children: [
-                SlidableAction(
-                  autoClose: true,
-                  onPressed: (_) async {
-                    final result = await _showDeleteConfirmation();
-                    if (!result) {
-                      return;// Manually close if cancelled
-                    }
-                    deleteBdnFromDB(element);
-                  },
-                  backgroundColor: const Color(0xFFFE4A49),
-                  foregroundColor: Colors.white,
-                  icon: Icons.delete,
-                  label: 'Delete',
-                ),
-              ],
-            ),
+            closeOnScroll: true, // Closes when list is scrolled
+            startActionPane:
+                (element['bitActive'] == 0 || element['isUpload'] == 1)
+                    ? null
+                    : ActionPane(
+                        motion: const DrawerMotion(),
+                        /// BDN inactive feature commented temporary
+                        // dismissible: DismissiblePane(
+                        //   closeOnCancel: true, // Close on cancel tap
+                        //   confirmDismiss: () async {
+                        //     final controller = Slidable.of(context);
+                        //     final result = await _showDeleteConfirmation();
+                        //     if (!result) {
+                        //       controller?.close(); // Manually close if cancelled
+                        //     }
+                        //     return result;
+                        //   },
+                        //   onDismissed: () {
+                        //     inactiveBdnFromDB(element);
+                        //   },
+                        // ),
+                        children: [
+                          /// BDN inactive feature commented temporary
+                          //   SlidableAction(
+                          //     autoClose: true,
+                          //     onPressed: (_) async {
+                          //       final result = await _showDeleteConfirmation();
+                          //       if (!result) {
+                          //         return; // Manually close if cancelled
+                          //       }
+                          //       inactiveBdnFromDB(element);
+                          //     },
+                          //     backgroundColor: const Color(0xFFFE4A49),
+                          //     foregroundColor: Colors.white,
+                          //     icon: Icons.disabled_by_default,
+                          //     label: 'Inactive',
+                          //   ),
+                          SlidableAction(
+                            autoClose: true,
+                            onPressed: (_) async {
+                              //final result = await _showEditConfirmation();
+                              // if (!result) {
+                              //   return; // Manually close if cancelled
+                              // }
+                              //TODO: implement edit method
+                            },
+                            backgroundColor: const Color(0xFF0392CF),
+                            foregroundColor: Colors.white,
+                            icon: Icons.edit,
+                            label: 'Edit',
+                          ),
+                        ],
+                      ),
             endActionPane: ActionPane(
               motion: const DrawerMotion(),
               children: [
-                SlidableAction(
-                  onPressed: (_) => _uploadBDN(element['jobItemID']),
-                  backgroundColor: const Color(0xFF0392CF),
-                  foregroundColor: Colors.white,
-                  icon: Icons.cloud_upload,
-                  label: 'Upload',
-                ),
+                if (element['isUpload'] == 0)
+                  SlidableAction(
+                    onPressed: (_) => _uploadBDN(element['jobItemID']),
+                    backgroundColor: const Color(0xFF0392CF),
+                    foregroundColor: Colors.white,
+                    icon: Icons.cloud_upload,
+                    label: 'Upload',
+                  ),
                 SlidableAction(
                   onPressed: (_) => _downloadJSON(element['jobItemID']),
                   backgroundColor: Colors.green,
@@ -190,7 +212,8 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                         Text(element['jobProductCode'].toString()),
                       ],
                     ),
-                    Text(DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.parse(element['createdAt']))),
+                    Text(DateFormat('yyyy-MM-dd HH:mm:ss')
+                        .format(DateTime.parse(element['createdAt']))),
                   ],
                 ),
                 trailing: Row(
@@ -205,7 +228,17 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                         ),
                         onPressed: null,
                       )
-                    else if (element['isUpload'] == true)
+                    /// BDN inactive feature commented temporary
+                    // else if (element['bitActive'] == 0)
+                    //   const IconButton(
+                    //     icon: Icon(
+                    //       Icons.do_not_disturb_on_rounded,
+                    //       color: Colors.red,
+                    //       size: 35,
+                    //     ),
+                    //     onPressed: null,
+                    //   )
+                    else if (element['isUpload'] == 1)
                       const IconButton(
                         icon: Icon(
                           Icons.cloud_done,
@@ -214,7 +247,7 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
                         ),
                         onPressed: null,
                       )
-                    else if (element['isUpload'] == false)
+                    else if (element['isUpload'] == 0)
                       const IconButton(
                         icon: Icon(
                           Icons.cloud_upload,
@@ -236,74 +269,108 @@ class _BDNUploadScreenState extends State<BDNUploadScreen> {
 
   /// UPLOAD METHOD
   Future<void> _uploadBDN(int jobItemID) async {
-    // TODO: check BDN already uploaded or not
+    Map<String, dynamic> bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID);
 
-    BDN bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID);
+    ApiResponse response =
+        await BDNInfoAPIService.uploadBDNInfoToServer(bdnInfo);
 
-    // TODO: create API call to upload BDN to server
-
-    if(!mounted){
+    if (!mounted) {
       return;
     }
-    // Show alert
-    CustomNotification.showSuccess(
-      context: context,
-      message: "BDN ${bdnInfo.bdnNo} Uploaded.",
-    );
+    if (response.status! == true) {
+      BDNInfoDB.updateBDNByJobItemID(jobItemID);
+
+      //Update current state
+      setState(() {
+        bdnList = bdnList.map((item) {
+          if (item['jobItemID'] == jobItemID) {
+            return {...item, 'isUpload': 1};
+          }
+          return item; // Return unchanged items
+        }).toList();
+      });
+
+      CustomNotification.showSuccess(
+        context: context,
+        message: "BDN ${bdnInfo['bdnNo']} Uploaded.",
+      );
+    } else {
+      CustomNotification.showError(
+        context: context,
+        message: response.message.toString(),
+      );
+    }
   }
 
-  /// DOWNLOAD JSON FILE METHOD
+  /// DOWNLOAD BDN INFO AS A JSON FILE
   Future<void> _downloadJSON(int jobItemID) async {
-    BDN bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID);
+    Map<String, dynamic> bdnInfo = await BDNInfoDB.getBDNByJobItemID(jobItemID);
 
-    // Download BDN as a JSON File
-    if(!mounted){
+    if (!mounted) {
       return;
     }
-    await downloadJSONFile(context, bdnInfo);
+    downloadJSONFile(context, bdnInfo);
 
-    if(!mounted){
-      return;
-    }
     CustomNotification.showSuccess(
       context: context,
-      message: "BDN ${bdnInfo.bdnNo} Downloaded.",
+      message: "BDN ${bdnInfo['bdnNo']} Downloaded.",
     );
   }
 
-  /// DELETE METHOD
-  void deleteBdnFromDB(element) {
-    //TODO: make this proper way on the DB side as well
+  /// BDN inactive feature commented temporary
+  /// BDN Inactive Method
+  // Future<void> inactiveBdnFromDB(element) async {
+  //   DbResponse response =
+  //       await BDNInfoDB.inactiveBDNStatusByBDNID(element['bdnID']);
+  //
+  //   if (!mounted) {
+  //     return;
+  //   }
+  //   if (response.status == true) {
+  //     //Update current state
+  //     setState(() {
+  //       bdnList = bdnList.map((item) {
+  //         if (item['bdnID'] == element['bdnID']) {
+  //           return {...item, 'bitActive': 0};
+  //         }
+  //         return item; // Return unchanged items
+  //       }).toList();
+  //     });
+  //
+  //     CustomNotification.showSuccess(
+  //       context: context,
+  //       message: response.message.toString(),
+  //     );
+  //   } else {
+  //     CustomNotification.showError(
+  //       context: context,
+  //       message: response.message.toString(),
+  //     );
+  //   }
+  // }
 
-    setState(() {
-      bdnList.removeWhere((item) =>
-      item['bdnID'] == element['bdnID']);
-    });
-  }
-
+  /// BDN inactive feature commented temporary
   /// Alert dialog for delete confirmation
-  Future<bool> _showDeleteConfirmation() async {
-    return await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirm Delete'),
-          content: const Text('Are you sure you want to delete this item?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('No'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Yes'),
-            ),
-          ],
-        );
-      },
-    ) ?? false;
-  }
-
-
-
+  // Future<bool> _showDeleteConfirmation() async {
+  //   return await showDialog(
+  //         context: context,
+  //         builder: (BuildContext context) {
+  //           return AlertDialog(
+  //             title: const Text('Confirm Delete'),
+  //             content: const Text('Are you sure you want to delete this item?'),
+  //             actions: <Widget>[
+  //               TextButton(
+  //                 onPressed: () => Navigator.of(context).pop(false),
+  //                 child: const Text('No'),
+  //               ),
+  //               TextButton(
+  //                 onPressed: () => Navigator.of(context).pop(true),
+  //                 child: const Text('Yes'),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       ) ??
+  //       false;
+  // }
 }
